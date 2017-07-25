@@ -1,2 +1,0 @@
-#define Tutorial_VERSION_MAJOR @HtsgetServer_VERSION_MAJOR@
-#define Tutorial_VERSION_MINOR @HtsgetServer_VERSION_MINOR@

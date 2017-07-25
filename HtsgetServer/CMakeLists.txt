@@ -1,3 +1,5 @@
+project(HtsgetServer)
+
 # include directory
 include_directories(include)
 include_directories(${PROJECT_SOURCE_DIR}/htslib/include)
@@ -8,9 +10,12 @@ set(SOURCE_FILES
     include/server.h
 )
 
-# add executable 
-add_executable(server ${SOURCE_FILES})
 
-# link with htslibs 
-target_link_libraries(server htslib)
+# boost 
+find_package(Boost 1.64.0 COMPONENTS filesystem regex)
+if(Boost_Found)
+    include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+    add_executable(server ${SOURCE_FILES})
+    target_link_libraries(server ${Boost_LIBRARIES} htslib)
+endif()
 

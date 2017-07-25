@@ -1,19 +1,12 @@
 #include <iostream>
 #include "server.h"
-#include "foo.h"
+#include "boost/filesystem.hpp"
 
 using namespace std;
 
 int main()
 {
-    if (FOO_MACRO == 1)
-    {
-        cout << "here" << endl;
-    }
-    else
-    {
-        cout << "not here" << endl;
-    }
+    cout << "here" << endl;
 
     return 0;
 }
