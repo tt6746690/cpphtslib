@@ -1,12 +1,13 @@
 
 
 
-### Server architecture
+# Server architecture
 
 
+### [Boost.Asio](http://www.boost.org/doc/libs/1_64_0/doc/html/boost_asio.html) Tutorial
 
-[Boost.Asio](http://www.boost.org/doc/libs/1_64_0/doc/html/boost_asio.html)
 
+#### Overview
 
 + _core concepts_
     + `io_service`, interface with OS resource 
@@ -99,6 +100,19 @@
     + _scatter-gather operation_
         + scatter-read receives data into multiple buffers 
         + gather-write transmits multiple buffers
+        ```cpp 
+        char d1[128];
+        vector<char> d2(128);
+        boost::array<array, 128> d3;
+
+        boost::array<mutable_buffer, 3> bufs1 = {
+            boost::asio::buffer(d1),
+            boost::asio::buffer(d2),
+            boost::asio::buffer(d3)
+        };
+        bytes_transferred = sock.receive(bufs1);
+        bytes_transferred = sock.send(bufs1);s
+        ```
     + _abstraction for a collection of buffers_
         + define a type to represent a single buffer and 
             ```cpp
@@ -140,8 +154,195 @@
                 boost::asio::buffers_begin(bufs),
                 boost::asio::buffers_begin(bufs) + n);
             ```
-    + _debugging buffer_
-        + 
++ _streams, short reads, short writes_
+    + Many I/O objects are _stream-oriented_
+        + no message boundaries, data being transferred is a continuoug sequences of bytes
+        + read/write may transfer fewer bytes than requested, (short read/write)
+    + _type requirement for stream-oriented IO model_
+        + `SyncReadStream`, sync read with `read_some()`
+        + `AsyncReadStream`, async read with `async_read_some()`
+        + `SyncWriteStream`, sync write with `write_some()`
+        + `AsyncWriteStream`, async write with `async_write_some()`
+    + _examples_    
+        + `ip::tcp::socket::stream<>`
+        + `posix::stream_descriptor`
+    + _transfer exact number of bytes_
+        + When short read/write occurs, 
+            + program have to restart operation, and
+            + continue to do so until required number of bytes has been transferred
+        + use 
+            + `read()`, `async_read()`, `write()`, `async_write()`
+    + _EOF is an error_
+        + can be used to distinguish end of stream from a successful read of size 0
++ _reactor style operations_
+    + for use if want to handle IO without using asio
+        + i.e. `select` `epoll` manually
+    + `null_buffer`, does not return until IO objectis read to perform the operation
++ _line-based operations_
+    + protocols line-based
+        + elements deliminated by `\r\n` (i.e. HTTP, SMTP, FTP)
+    + _solution_ 
+        + use `read_until()` and `async_read_until()`
+        ```cpp 
+        class http_connection {
+            void start(){
+                boost::asio::async_read_until(socket_, data_, "\r\n",,
+                    boost::bind(&http_connection::handle_request_line, this, _1));
+            }
+
+            void handle_request_line(boost::system::error_code ec){
+                if(!ec)
+                {
+                    string method, uri, version;
+                    char sp1, sp2, cr, lf;
+                    istream is(&data_);
+                    is.unsetf(std::ios_base::skipws);
+                    is >> method >> sp1 >> uri >> sp2 >> version >> cr >> lf;
+                }        
+            }
+            boost::asio::ip::tcp::socket socket_;
+            boost::asio::streambuf data_;          
+            /* 
+                streambuf
+                    -- used to store data read from socket before searching for delim
+                    -- note there may be additional data after delim, the surplus should be lest in streambuf so that it may be inspected by a subsequent call to read_until()
+            */
+        }
+        ```
+        ```cpp 
+        class match_char {
+            public:
+                explict match-char(char c) : c_(c){}
+
+                template<typename Iterator>
+                pair<Iterator, bool> operator(
+                    Iterator begin, Iterator end
+                ) const {
+                    Iterator i = begin;
+                    while(i != end){
+                        if(c_ == *i++)
+                            return make_pair(i, true);
+                    }
+                    return make_pair(i, false);
+                }
+            private:
+                char c_;
+        }
+
+        namespace boost::asio {
+            template<>
+            struct is_match_condition<match_char>
+                : pubilc boost::true_type {};
+        }
+
+        boost::asio::streambuf b;
+        boost::asio::read_until(s, b, match_char('a'));
+        ```
++ _custom memory allocation_ 
+    + _motivation_
+        + async operation rquires allocating objects to store state, and
+        + some protocol (ie. half duplex protocol impl HTTP) have a single chain of operation per client 
+    + _program should be able to reuse memory for all async operation in a chain_
+    + _allocation_ (impl with `new` `delete`)
+        + guarantees deallocation occur before the associated handler is invoked 
+        + this is so memory can be reused for any new asyn operation started by `handler`
+        ```cpp 
+        void* pointer = asio_handler_allocate(size, &h);
+        asio_handler_deallocate(pointer, size, &h);
+        ```
++ _handler tracking_
+    + _motivation_ 
+        + aid in debuging async programs
+    + _usage_ 
+        + `#define BOOST_ASIO_ENABLE_HANDLER_TRACKING`
+        + `<tag>|<timestamp>|<action>|<description>`
+        + `<action>`
+            + `>n`, enter handler number `n`
+            + `<n`, left handler number `n`
+            + `!n`, left ahdnle number `n` due to exception 
+            + `~n`,  handler number `n` destroyed without having been invoked, case for unfinished async operation when `io_service` is destroyed
+            + `n*m` handler `n` created a new async operation with completion handler `m`
+            + `n` handler `n` perform some other operatoin
+    + _tooling_
+        + [perl script](https://github.com/boostorg/asio/blob/master/tools/handlerviz.pl) post-process debug output
+
+#### Networking 
+
++ _TCP clients_
+        + name resolution using a resolver, 
+        + host + service name looked up and converted to endpoints
+        ```cpp 
+        ip::tcp::resolver resolver(io_service);
+        ip::tcp::resolver::query query("www.boost.org", "http");
+        ip::tcp::resolver::iterator iter = resolver.resolve(query);
+        ip::tcp::resolver::iterator end; // End marker.
+
+        while (iter != end)
+        {
+            ip::tcp::endpoint endpoint = *iter++;
+            std::cout << endpoint << std::endl;
+        }
+        ```
+        + note
+            + returns a list of endpoints using `IPv4` and `IPv6` endpoints
+    + `connect()` and `async_connect()`
+        + try each endpoints in a list until the socket is successfully connected
+        ```cpp 
+        ip::tcp::socket socket(io_service);
+        boost::asio::async_connect(socket, iter,
+            boost::bind(&client:handle_connect, this, boost::asio::placeholders::error));
+        
+        void handle_connect(const error_code& ec){
+            if(!ec){
+                // read/write operation
+            }
+        }
+        ```
+        + given an endpoint
+        ```cpp 
+        ip::tcp::socket socket(my_io_service);
+        socket.connect(endpoint);
+        ```
+    + `read`, `write`, `async_read`, `async_write`.... 
++ _TCP server_
+    + use acceptor to accept incoming connection 
+    ```cpp 
+    ip::tcp::acceptor acceptor(io_service, my_endpoint);
+    ip::tcp::socket socket(io_sevice);
+    acceptor.accept(socket);
+    ```
++ _socket iostreams_
+    + `ip::tcp::iostream stream(host, protocol)`
+        + hide away endpoint resolution, 
+        + is protocol independent
+        ```cpp 
+        ip::tcp::iostream stream("www.boost.org", "http");
+        if(!stream){
+            // cannot connect
+        }
+        ```
++ _The BSD Socket API and Boost.Asio_
+    + inclulow-level socket interface based on BSD socket API
+
+#### C++11 support 
+
++ _movable IO object_
+    + `#define BOOST_ASIO_HAS_MOVE`
++ _movable IO handler_ 
++ _shared pointer_
+    + `#define BOOST_ASIO_HAS_STD_SHARED_PTR`
++ _atomics_
+    + `#define BOOST_ASIO_HAS_STD_ATOMIC`
++ _array_ 
+    + `#define BOOST_ASIO_HAS_STD_ARRAY`
++ _chrono_
+    + `#define BOOST_ASIO_HAS_STD_CHRONO`
+
+#### SSL 
+
++ _motivation_ 
+    + encrypt communication on top of existing streams
+
 
 
 ### Boost.Asio API
@@ -170,14 +371,67 @@
 + `io_service::strand`
     + provides ability to post/dispatch handlers with guarantee that none of those handlers will execute concurrently 
 + `strand::wrap(Handler)`
-    + craete a new handler (functor) that automatically dispatches the wrapped handler on the strand 
+    + craete a new handler (function object) that automatically dispatches the wrapped handler on the strand 
     + used to create a new handler object that, when invoked, will automatically pass the wrapped handler to the strand's dispatch function
++ `buffer`
+    + represent contiguous region of memory 
+    + _construction_ 
+        + create from `array`, `vector`, or `boost::array` or POD...
+            + with `boost::asio::buffer(data, size)`, note size is deduced from type of `data`, fixed size sequence containers 
+        ```cpp 
+        char d1[128];
+        size_t bytes_transferred = sock.receive(boost::asio::buffer(d1));
+        vector<char> d2(128);
+        bytes_transferred = sock.receive(boost::asio::buffer(d2));
+        array<char, 128> d3;
+        bytes_transferred = sock.receive(boost::asio::buffer(d3));
+        ```
+    + _access_
+        + with `buffer_size` and `buffer_cast`
+        ```cpp 
+        boost::asio::mutable_buffer b1 = ...;
+        std::size_t s1 = boost::asio::buffer_size(b1);
+        unsigned char* p1 = boost::asio::buffer_case<unsigned char*>(b1);
+        
+        boost::asio::const_buffer b2 = ...;
+        std::size_t s2 = boost::asio::buffer_size(b2);
+        const void* p2 = boost::asio::buffer_cast<const void*>(b2);
+        ```
+    + _usage_ [stackoverflow](https://stackoverflow.com/questions/15060671/boostasiobuffer-getting-the-buffer-size-and-preventing-buffer-overflow)
+        + _reading data_
+            + use `socket::available()` to determine size of buffer
+            ```cpp
+            std::vector<char> data(socket_.available());
+            boost::asio::read(socket_, boost::asio::buffer(data));
+            ```
+            + or dynamic length buffer `boost::asio::streambuf()` with `read()` which accepts a `streambuf`
+            ```cpp 
+            boost::asio::streambuf data;
+            boost::asio::read(socket_, data, boost::asio::transfer_at_least(socket_.available()));
+            ```
+            + variable length protocol, 
+                + header is fixed size (containing meta-information)
+                + body size is inside header (allocate buffer for body)
+            ```cpp 
+            // read fixed size header 
+            vector<char> data(fixed_header_size);
+            boost::asio::read(socket_, boost::asio::buffer(data));
+
+            protocol::header header(data);
+            network_to_local(header);       // endianness
+
+            // read body
+            data.resize(header.body_length());
+            boost::asio::read(socket_, boost::asio::buffer(data));
+
+            protocol::body body(data);
+            network_to_local(body);
+            ```
 
 
-### Boost.Asio 
 
 
-[Python SimpleHTTPserver](https://docs.python.org/2/library/basehttpserver.html#BaseHTTPServer.BaseHTTPRequestHandler.error_message_format)
+### [Python SimpleHTTPserver](https://docs.python.org/2/library/basehttpserver.html#BaseHTTPServer.BaseHTTPRequestHandler.error_message_format)
 
 _server_ 
 + _classes_

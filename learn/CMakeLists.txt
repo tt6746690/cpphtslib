@@ -7,5 +7,10 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-add_executable(timer.5 code/timer.5.cpp)
-target_link_libraries(timer.5 ${Boost_LIBRARIES})
+add_executable(timer code/timer.cpp)
+add_executable(TCP_daytime_server code/TCP_daytime_server.cpp)
+
+
+target_link_libraries(timer ${Boost_LIBRARIES})
+target_link_libraries(TCP_daytime_server ${Boost_LIBRARIES})
+
