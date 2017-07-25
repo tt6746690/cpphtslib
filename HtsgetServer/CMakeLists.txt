@@ -11,11 +11,9 @@ set(SOURCE_FILES
 )
 
 
-# boost 
-find_package(Boost 1.64.0 COMPONENTS filesystem regex)
-if(Boost_Found)
-    include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+find_package(Boost 1.64.0 REQUIRED COMPONENTS system regex thread date_time)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
     add_executable(server ${SOURCE_FILES})
     target_link_libraries(server ${Boost_LIBRARIES} htslib)
 endif()
-

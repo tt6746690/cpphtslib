@@ -1,5 +1,7 @@
 
-_Htsget [protocol](http://samtools.github.io/hts-specs/htsget.html)_
+
+### Htsget [protocol](http://samtools.github.io/hts-specs/htsget.html)
+
 + _a data retrieval API for client/server model_
     - [ ] Support BAM/CRAM data formats
     - [ ] Access to subsets of genomic data (for browsing specific region) to full genomes (calling variants)

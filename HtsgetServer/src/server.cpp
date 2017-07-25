@@ -1,4 +1,6 @@
 #include <iostream>
+#include <boost/asio.hpp>
+
 #include "server.h"
 #include "boost/filesystem.hpp"
 
