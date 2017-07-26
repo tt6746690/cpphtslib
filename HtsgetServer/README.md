@@ -1,5 +1,12 @@
 
 
+
+### Resources
+
++ configure include path for `c_cpp_properties.json` with `gcc -xc++ -E -v -`
++ [Asio doc](http://think-async.com/Asio/asio-1.10.6/doc/)
+
+
 ### Htsget [protocol](http://samtools.github.io/hts-specs/htsget.html)
 
 + _a data retrieval API for client/server model_

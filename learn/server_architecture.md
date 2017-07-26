@@ -1,10 +1,56 @@
 
 
+# Resources 
+
++ [async io with boost.asio](https://www.youtube.com/watch?v=rwOv_tw2eA4)
+    + should use `strand` when writing to socket (in multithreaded situ), since there is just one socket...
+    + `buffer`s are essentially _views_ to memory owned by the application, 
+        + `buffer` does not own the underlying memory
+        + the underlying memory is allocated on stack/heap (owned) by the application.
+    + scatter-gather may want to send say `header`, `body`, `data`, ... in one `sock.send(bufs)` efficiently 
+    + _who owns client handler_
+        + ![](2017-07-26-00-02-29.png)
+        + some client handler manager? 
+            + delete handler when connection done.. 
+            + but poor design... 
+        + _answer_
+            + if no more work for client handler, then client handler is dead
+                + i.e. nothing left to send 
+                + i.e. nothing left to read (disconnection from server)
+            + so client handler should _own itself_, since it knows best about 
+                + buffer allocated for connection
+                + local variable, ... connection info, request...
+    + _chaining completion handler_ 
+        + idea is proceed to next read/write/procedure if previous one is successful, otherwise drop it
++  _chat server_
+    + the goal 
+        ```cpp 
+        asio_generic_sever<chat_handler> server;
+        server.start(8888);
+        ```
+    ```cpp 
+    template<typename ConnectionHandler>
+    class asio_generic_server {
+        using shared_handler_t = shared_ptr<ConnectionHandler>;
+
+        public:
+            asio_genes
+
+        private:
+            int thread_count_;
+            vector<thread> thread_pool_;
+            io_service io_service_;
+            ip::tcp::acceptor acceptor_;
+    }
+    ```
+        
+
 
 # Server architecture
 
 
-### [Boost.Asio](http://www.boost.org/doc/libs/1_64_0/doc/html/boost_asio.html) Tutorial
+### [Asio](http://think-async.com/Asio/asio-1.10.6/doc/)
+### [Boost.Asio](http://www.boost.org/doc/libs/1_64_0/doc/html/boost_asio.html) 
 
 
 #### Overview
@@ -326,17 +372,19 @@
 
 #### C++11 support 
 
++ _error_
+    + `#define ASIO_HAS_STD_SYSTEM_ERROR`
 + _movable IO object_
-    + `#define BOOST_ASIO_HAS_MOVE`
+    + `#define ASIO_HAS_MOVE`
 + _movable IO handler_ 
 + _shared pointer_
-    + `#define BOOST_ASIO_HAS_STD_SHARED_PTR`
+    + `#define ASIO_HAS_STD_SHARED_PTR`
 + _atomics_
-    + `#define BOOST_ASIO_HAS_STD_ATOMIC`
+    + `#define ASIO_HAS_STD_ATOMIC`
 + _array_ 
-    + `#define BOOST_ASIO_HAS_STD_ARRAY`
+    + `#define ASIO_HAS_STD_ARRAY`
 + _chrono_
-    + `#define BOOST_ASIO_HAS_STD_CHRONO`
+    + `#define ASIO_HAS_STD_CHRONO`
 
 #### SSL 
 

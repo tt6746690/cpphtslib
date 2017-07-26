@@ -1,5 +1,8 @@
+.vscode/
 
 build/
 bin/
-.vscode/
-log
+lib/
+
+learn/code
+
