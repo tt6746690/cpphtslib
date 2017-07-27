@@ -17,10 +17,9 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 # add subdirectories 
 add_subdirectory(${PROJECT_SOURCE_DIR}/HtsgetServer)
-# add_subdirectory(${PROJECT_SOURCE_DIR}/htslib)
-# add_subdirectory(${PROJECT_SOURCE_DIR}/learn)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
 
 
-# cmake -H. -Bbuild 
+# cmake -H. -Bbuild -Wno-dev
 # cmake --build build -- -j3
 # ./bin/server

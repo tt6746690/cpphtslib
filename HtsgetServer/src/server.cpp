@@ -3,9 +3,7 @@
 #include <utility> // make_pair
 #include <chrono>
 
-#include "server.h"
-
-using namespace std;
+#include "Server.h"
 
 namespace Htsget
 {
@@ -17,7 +15,7 @@ void GenericServer::run()
     acceptor_.async_accept(
         socket_,
         [=](auto ec) {
-            cout << "accepting connection" << endl;
+            std::cout << "accepting connection" << std::endl;
         });
 
     /* start event loop */
@@ -34,27 +32,9 @@ void GenericServer::configure_acceptor()
     acceptor_.open(endpoint.protocol());
     acceptor_.set_option(
         asio::ip::tcp::acceptor::reuse_address(true));
+    acceptor_.set_option(
+        asio::ip::tcp::no_delay(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
 }
-}
-
-int main()
-{
-    using Htsget::GenericServer;
-
-    asio::io_service io;
-    GenericServer::ServerAddr server_address = make_pair("127.0.0.1", 8888);
-
-    try
-    {
-        auto server = make_unique<GenericServer>(server_address);
-        server->run();
-    }
-    catch (std::exception e)
-    {
-        cerr << e.what() << endl;
-    }
-
-    return 0;
 }

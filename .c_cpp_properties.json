@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "name": "null",
+      "includePath": [
+        "/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1",
+        "/usr/local/include",
+        "/Library/Developer/CommandLineTools/usr/bin/../lib/clang/7.3.0/include",
+        "/Library/Developer/CommandLineTools/usr/include",
+        "/usr/include",
+        "/System/Library/Frameworks",
+        "/Library/Frameworks"
+      ],
+      "defines": [],
+      "browse": {
+        "path": [
+          "${workspaceRoot}",
+          "/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1",
+          "/usr/local/include",
+          "/Library/Developer/CommandLineTools/usr/bin/../lib/clang/7.3.0/include",
+          "/Library/Developer/CommandLineTools/usr/include",
+          "/usr/include",
+          "/System/Library/Frameworks",
+          "/Library/Frameworks"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      },
+      "intelliSenseMode": "clang-x64"
+    }
+  ],
+  "version": 2
+}
