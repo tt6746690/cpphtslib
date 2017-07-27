@@ -25,10 +25,15 @@ public:
         acceptor_(io_service_),
         socket_(io_service_) {}
 
-  /*  
-        Initiate event loop 
-    */
+  /**
+   * @brief   Starts the server
+   *  Initiate io_service event loop, 
+   *  acceptor instantiates and queues connection
+   */
   void run();
+
+  std::string host() const;
+  int port() const;
 
 private:
   const ServerAddr &server_address_;
@@ -36,7 +41,7 @@ private:
   asio::ip::tcp::acceptor acceptor_;
   asio::ip::tcp::socket socket_;
 
-  void configure_acceptor();
+  void accept_connection();
 };
 }
 
