@@ -11,8 +11,8 @@ class Request : public Message
 public:
   std::string method;
   std::string uri;
-  std::string version;
-  Headers headers;
+  int version_major;
+  int version_minor;
   std::string body;
 };
 }

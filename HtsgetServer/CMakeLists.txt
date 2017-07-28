@@ -19,12 +19,14 @@ set(SOURCE_FILES
     src/Server.cpp 
     src/Connection.cpp
     src/RequestParser.cpp
+    src/Utilities.cpp
     include/Server.h
     include/Connection.h 
     include/Message.h 
     include/Request.h 
     include/RequestParser.h 
     include/Response.h 
+    include/Utilities.h
 )
 
 add_executable(server ${SOURCE_FILES})

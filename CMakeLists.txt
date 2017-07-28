@@ -2,9 +2,10 @@
 cmake_minimum_required(VERSION 2.6)
 project(HtsgetServer)
 
-# compiler   
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -stdlib=libc++ -Wall")
+# compiler
 set(CMAKE_CXX_COMPILER_ID "Clang")
+# set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm@4/bin/clang-4.0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -stdlib=libc++ -Wall")
 
 # generic path 
 set(CMAKE_BINARY_DIR ${PROJECT_SOURCE_DIR}/bin)      
