@@ -3,7 +3,7 @@
 
 #include "Message.h"
 
-namespace Htsget
+namespace Http
 {
 
 class Response : public Message

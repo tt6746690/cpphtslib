@@ -9,13 +9,6 @@ set(HEADER_ONLY_INCLUDE
     ../lib/asio-1.10.6/include
     ../lib/Catch/single_include)
 
-# # set up library 
-# add_library(asio INTERFACE)
-# target_sources(asio INTERFACE ${ASIO_INCLUDE}/asio.hpp)
-# target_include_directories(asio INTERFACE
-#     "${ASIO_INCLUDE}"
-# )
-
 # # include directory
 include_directories(include)
 include_directories(SYSTEM ${HEADER_ONLY_INCLUDE})
@@ -25,10 +18,12 @@ set(SOURCE_FILES
     main.cpp
     src/Server.cpp 
     src/Connection.cpp
+    src/RequestParser.cpp
     include/Server.h
     include/Connection.h 
     include/Message.h 
     include/Request.h 
+    include/RequestParser.h 
     include/Response.h 
 )
 

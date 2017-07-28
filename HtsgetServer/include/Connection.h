@@ -3,8 +3,9 @@
 
 #include "Request.h"
 #include "Response.h"
+#include "RequestParser.h"
 
-namespace Htsget
+namespace Http
 {
 
 class Connection
@@ -22,8 +23,10 @@ public:
 private:
   asio::ip::tcp::socket socket_;
   std::array<char, 4096> buffer_;
+
   Request request_;
   Response response_;
+  RequestParser request_parser_;
 };
 }
 

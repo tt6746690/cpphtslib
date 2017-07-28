@@ -6,7 +6,7 @@
 #include "Server.h"
 #include "Connection.h"
 
-namespace Htsget
+namespace Http
 {
 
 void GenericServer::run()

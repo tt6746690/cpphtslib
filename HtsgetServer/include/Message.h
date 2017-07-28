@@ -3,7 +3,7 @@
 
 #include <utility> // pair
 
-namespace Htsget
+namespace Http
 {
 
 using Header = std::pair<std::string, std::string>;

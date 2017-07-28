@@ -7,7 +7,7 @@
 #include "asio.hpp"
 #endif
 
-namespace Htsget
+namespace Http
 {
 
 class GenericServer
