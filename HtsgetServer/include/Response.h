@@ -10,10 +10,10 @@ class Response : public Message
 {
 
 public:
-  std::string version;
-  StatusCode status_code;
-  std::string reason;
-  std::string body;
+  StatusCode status_code_;
+  std::string reason_;
+
+  friend std::ostream &operator<<(std::ostream &strm, const Response &response);
 };
 }
 

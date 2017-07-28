@@ -56,97 +56,134 @@ auto RequestParser::consume(Request &request, char c) -> ParseStatus
     {
     case s::req_start:
         if (is_cr(c))
+        {
             state_ = s::req_start_lf;
-        return status::in_progress;
+            return status::in_progress;
+        }
         if (is_token(c))
+        {
             state_ = s::req_method;
-        request.method.push_back(c);
-        return status::in_progress;
+            request.method_.push_back(c);
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_start_lf:
         if (is_lf(c))
+        {
             state_ = s::req_start;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_method:
         if (is_token(c))
-            request.method.push_back(c);
-        return status::in_progress;
+        {
+            request.method_.push_back(c);
+            return status::in_progress;
+        }
         if (is_sp(c))
+        {
             state_ = s::req_uri;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_uri:
         if (is_uri(c))
-            request.uri.push_back(c);
-        return status::in_progress;
+        {
+            request.uri_.push_back(c);
+            return status::in_progress;
+        }
         if (is_sp(c))
+        {
             state_ = s::req_http_h;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_h:
         if (c == 'H')
+        {
             state_ = s::req_http_ht;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_ht:
         if (c == 'T')
+        {
             state_ = s::req_http_htt;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_htt:
         if (c == 'T')
+        {
             state_ = s::req_http_http;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_http:
         if (c == 'P')
+        {
             state_ = s::req_http_slash;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_slash:
         if (c == '/')
+        {
             state_ = s::req_http_major;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_major:
         if (is_digit(c))
-            request.version_major = c - '0';
-        state_ = s::req_http_dot;
-        return status::in_progress;
+        {
+            request.version_major_ = c - '0';
+            state_ = s::req_http_dot;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_dot:
         if (c == '.')
+        {
             state_ = s::req_http_minor;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_http_minor:
         if (is_digit(c))
-            request.version_minor = c - '0';
-        state_ = s::req_start_line_cr;
-        return status::in_progress;
+        {
+            request.version_minor_ = c - '0';
+            state_ = s::req_start_line_cr;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_start_line_cr:
         if (is_cr(c))
+        {
             state_ = s::req_start_line_lf;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_start_line_lf:
         if (is_lf(c))
+        {
             state_ = s::req_field_name;
-        return status::in_progress;
+            return status::in_progress;
+        }
         return status::reject;
     case s::req_field_name:
         if (is_cr(c))
+        {
             state_ = s::req_header_lf;
-        return status::in_progress;
-        if (is_token(c))
-        // request.headers
-        case s::req_field_value:
-        case s::req_header_cr:
-        case s::req_header_lf:
-        default:
-            break;
+            return status::in_progress;
+        }
+    // if (is_token(c))
+    // return status::in_progress;
+    // request.headers_
+    case s::req_field_value:
+    case s::req_header_cr:
+    case s::req_header_lf:
+    default:
+        break;
     }
     return status::reject;
 }

@@ -39,6 +39,7 @@ void Connection::read_payload()
           request_, buffer_.begin(), buffer_.begin() + bytes_transferred);
 
       std::cout << parse_status << std::endl;
+      std::cout << request_ << std::endl;
     }
     else
     {

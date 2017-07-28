@@ -18,7 +18,9 @@ set(SOURCE_FILES
     main.cpp
     src/Server.cpp 
     src/Connection.cpp
+    src/Request.cpp
     src/RequestParser.cpp
+    src/Response.cpp
     src/Utilities.cpp
     include/Server.h
     include/Connection.h 

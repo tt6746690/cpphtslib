@@ -8,12 +8,12 @@ namespace Http
 
 class Request : public Message
 {
+
 public:
-  std::string method;
-  std::string uri;
-  int version_major;
-  int version_minor;
-  std::string body;
+  std::string method_;
+  std::string uri_;
+
+  friend std::ostream &operator<<(std::ostream &strm, const Request &request);
 };
 }
 
