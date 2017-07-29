@@ -1,0 +1,795 @@
+GET /hi HTTP/1.0
+Host: 127.0.0.1:8888
+User-Agent: curl/7.43.0
+Accept: */*
+
+state: 3	status: [In progress = 3]	char: G
+Method  : G
+Uri     : 
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 3	status: [In progress = 3]	char: E
+Method  : GE
+Uri     : 
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 3	status: [In progress = 3]	char: T
+Method  : GET
+Uri     : 
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 4	status: [In progress = 3]	char:  
+Method  : GET
+Uri     : 
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 4	status: [In progress = 3]	char: /
+Method  : GET
+Uri     : /
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 4	status: [In progress = 3]	char: h
+Method  : GET
+Uri     : /h
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 4	status: [In progress = 3]	char: i
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 5	status: [In progress = 3]	char:  
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 6	status: [In progress = 3]	char: H
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 7	status: [In progress = 3]	char: T
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 8	status: [In progress = 3]	char: T
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 9	status: [In progress = 3]	char: P
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 10	status: [In progress = 3]	char: /
+Method  : GET
+Uri     : /hi
+Version : 0.0
+Headers : 
+Body    : 
+
+state: 11	status: [In progress = 3]	char: 1
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+Body    : 
+
+state: 12	status: [In progress = 3]	char: .
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+Body    : 
+
+state: 13	status: [In progress = 3]	char: 0
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+Body    : 
+
+state: 14	status: [In progress = 3]	char: \r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+Body    : 
+
+state: 15	status: [In progress = 3]	char: \n
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+Body    : 
+
+state: 16	status: [In progress = 3]	char: H
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[H, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: o
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Ho, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: s
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Hos, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: t
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: :
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char:  
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 1
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 1]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 2
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 12]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 7
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: .
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 0
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: .
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 0
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: .
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 1
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: :
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 8
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 8
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:88]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 8
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:888]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 8
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+Body    : 
+
+state: 18	status: [In progress = 3]	char: \r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+Body    : 
+
+state: 19	status: [In progress = 3]	char: \n
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+Body    : 
+
+state: 15	status: [In progress = 3]	char: U
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: s
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[s, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: e
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[se, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: -
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: A
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-A, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: g
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Ag, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: e
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Age, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: n
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agen, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: t
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: :
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char:  
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: c
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, c]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: u
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, cu]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, cur]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: l
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: /
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 7
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: .
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 4
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.4]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 3
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: .
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: 0
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+Body    : 
+
+state: 18	status: [In progress = 3]	char: \r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+Body    : 
+
+state: 19	status: [In progress = 3]	char: \n
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+Body    : 
+
+state: 15	status: [In progress = 3]	char: A
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: c
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[c, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: c
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[cc, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: e
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[cce, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: p
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccep, ]
+
+Body    : 
+
+state: 16	status: [In progress = 3]	char: t
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: :
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char:  
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, ]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: *
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, *]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: /
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, */]
+
+Body    : 
+
+state: 17	status: [In progress = 3]	char: *
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, */*]
+
+Body    : 
+
+state: 18	status: [In progress = 3]	char: \r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, */*]
+
+Body    : 
+
+state: 19	status: [In progress = 3]	char: \n
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, */*]
+
+Body    : 
+
+state: 20	status: [In progress = 3]	char: \r
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, */*]
+
+Body    : 
+
+state: 20	status: [Accept = 1]	char: \n
+Method  : GET
+Uri     : /hi
+Version : 1.0
+Headers : 
+		[Host, 127.0.0.1:8888]
+
+		[ser-Agent, curl/7.43.0]
+
+		[ccept, */*]
+
+Body    : 
+

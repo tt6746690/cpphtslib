@@ -1,6 +1,8 @@
 #include <ostream>
+#include <cassert>
 
 #include "Request.h"
+#include "Message.h"
 #include "Utilities.h" // print pair
 
 namespace Http
@@ -15,7 +17,7 @@ std::ostream &operator<<(std::ostream &strm, const Request &request)
 
     for (auto header : request.headers_)
     {
-        strm << "\t\t" << header << std::endl;
+        strm << "\t" << header << std::endl;
     }
 
     strm << "Body    : " << std::endl;

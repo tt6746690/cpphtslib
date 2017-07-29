@@ -15,9 +15,9 @@ include_directories(SYSTEM ${HEADER_ONLY_INCLUDE})
 
 # server
 set(SOURCE_FILES 
-    main.cpp
     src/Server.cpp 
     src/Connection.cpp
+    src/Message.cpp
     src/Request.cpp
     src/RequestParser.cpp
     src/Response.cpp
@@ -31,16 +31,16 @@ set(SOURCE_FILES
     include/Utilities.h
 )
 
-add_executable(server ${SOURCE_FILES})
+add_executable(server main.cpp ${SOURCE_FILES})
 
 
 # test
 set(TEST_FILES
-    main-test.cpp 
-    test/test_fib.cpp
+    test/test_RequestParser.cpp
+    test/test_Message.cpp
 )
 
-add_executable(test ${TEST_FILES})
+add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
 
 
 # target_link_libraries(server lib)

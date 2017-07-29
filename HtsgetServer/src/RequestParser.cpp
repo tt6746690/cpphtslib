@@ -1,6 +1,10 @@
 #include <iostream>
+#include <vector> // emplace_back
 
 #include "RequestParser.h"
+#include "Message.h"
+#include "Request.h"
+#include "Utilities.h" // etoint
 
 namespace Http
 {
@@ -166,22 +170,96 @@ auto RequestParser::consume(Request &request, char c) -> ParseStatus
     case s::req_start_line_lf:
         if (is_lf(c))
         {
-            state_ = s::req_field_name;
+            state_ = s::req_field_name_start;
             return status::in_progress;
         }
         return status::reject;
+    case s::req_field_name_start:
+        if (is_cr(c))
+        {
+            state_ = s::req_header_end;
+            return status::in_progress;
+        }
+        if (is_token(c))
+        {
+            request.headers_.emplace_back();
+            request.build_header_name(c);
+            state_ = s::req_field_name;
+            return status::in_progress;
+        }
     case s::req_field_name:
+        if (is_token(c))
+        {
+            request.build_header_name(c);
+            return status::in_progress;
+        }
+        if (c == ':')
+        {
+            state_ = s::req_field_value;
+            return status::in_progress;
+        }
+        return status::reject;
+    case s::req_field_value:
+        if (is_sp(c) || is_ht(c))
+        {
+            return status::in_progress;
+        }
         if (is_cr(c))
         {
             state_ = s::req_header_lf;
             return status::in_progress;
         }
-    // if (is_token(c))
-    // return status::in_progress;
-    // request.headers_
-    case s::req_field_value:
-    case s::req_header_cr:
+        if (!is_ctl(c))
+        {
+            request.build_header_value(c);
+            return status::in_progress;
+        }
+        return status::reject;
     case s::req_header_lf:
+        if (is_lf(c))
+        {
+            state_ = s::req_header_lws;
+            return status::in_progress;
+        }
+        return status::reject;
+    case s::req_header_lws:
+        /* 
+            LWS            = [CRLF] 1*( SP | HT )
+            field-value    = *( field-content | LWS )
+
+            3 branches
+                1. c = (SP | HT)
+                    encounters \r\n(SP|HT), continue building header value
+                2. c = \r
+                    encounters \r\n\r, header ended here
+                3. c = valid chars 
+                    encounters \r\n{c}, starts reading a new header name
+
+        */
+        if (is_sp(c) || is_ht(c))
+        {
+            state_ = s::req_field_value;
+            return status::in_progress;
+        }
+        if (is_cr(c))
+        {
+            state_ = s::req_header_end;
+            return status::in_progress;
+        }
+        if (is_token(c))
+        {
+            request.headers_.emplace_back();
+            request.build_header_name(c);
+            state_ = s::req_field_name;
+            return status::in_progress;
+        }
+        return status::reject;
+    case s::req_header_end:
+        if (is_lf(c))
+        {
+            return status::accept;
+        }
+        return status::reject;
     default:
         break;
     }
@@ -288,5 +366,34 @@ constexpr bool RequestParser::is_uri(char c)
         }
     }
     return false;
+}
+
+auto RequestParser::view_state(RequestParser::State state, RequestParser::ParseStatus status, char c) -> void
+{
+    std::cout << "state: " << etoint(state)
+              << "\tstatus: " << status
+              << "\tchar: ";
+
+    if (is_char(c))
+    {
+        if (is_cr(c))
+        {
+            std::cout << "\\r";
+        }
+        else if (is_lf(c))
+        {
+            std::cout << "\\n";
+        }
+        else
+        {
+            std::cout << c;
+        }
+    }
+    else
+    {
+        std::cout << static_cast<int>(c);
+    }
+
+    std::cout << std::endl;
 }
 }

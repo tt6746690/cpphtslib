@@ -2,7 +2,9 @@
 #define REQUESTPARSER_H
 
 #include <algorithm>
+#include <iostream>
 #include <cassert>
+
 #include "Request.h"
 
 namespace Http
@@ -18,35 +20,36 @@ static constexpr char uri_charset[] =
 
 class RequestParser
 {
-  private:
-    enum class State
-    {
-        req_start = 1,
-        req_start_lf,
-        req_method,
-        req_uri,
-        req_http_h,
-        req_http_ht,
-        req_http_htt,
-        req_http_http,
-        req_http_slash,
-        req_http_major,
-        req_http_dot,
-        req_http_minor,
-        req_start_line_cr,
-        req_start_line_lf,
-        req_field_name,
-        req_field_value,
-        req_header_cr,
-        req_header_lf
-    };
-
   public:
     enum class ParseStatus
     {
         accept = 1,
         reject,
         in_progress
+    };
+
+    enum class State
+    {
+        req_start = 1,        // 1
+        req_start_lf,         // 2
+        req_method,           // 3
+        req_uri,              // 4
+        req_http_h,           // 5
+        req_http_ht,          // 6
+        req_http_htt,         // 7
+        req_http_http,        // 8
+        req_http_slash,       // 9
+        req_http_major,       // 10
+        req_http_dot,         // 11
+        req_http_minor,       // 12
+        req_start_line_cr,    // 13
+        req_start_line_lf,    // 14
+        req_field_name_start, // 15
+        req_field_name,       // 16
+        req_field_value,      // 17
+        req_header_lf,        // 18
+        req_header_lws,       // 19
+        req_header_end        // 20
     };
 
     explicit RequestParser() : state_(State::req_start){};
@@ -69,12 +72,14 @@ class RequestParser
     }
 
     /**
-   * @brief   Advance parser state given input char
-   */
+     * @brief   Advance parser state given input char
+     */
     auto consume(Request &request, char c) -> ParseStatus;
 
-  private:
+    static auto view_state(RequestParser::State state, RequestParser::ParseStatus status, char c) -> void;
     State state_;
+
+  private:
     /*
       OCTET          = <any 8-bit sequence of data>
       CHAR           = <any US-ASCII character (octets 0 - 127)>
