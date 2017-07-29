@@ -1,10 +1,25 @@
 #include <ostream>
+#include <string>
 
 #include "Response.h"
-#include "Utilities.h" // print pair
+#include "Utilities.h" // print pair, etostr
 
 namespace Http
 {
+
+std::string Response::status_line() const
+{
+    return "HTTP" + std::to_string(version_major_) + "." + std::to_string(version_minor_) + " " + etostr(status_code_) + " " + reason_ + "\r\n";
+};
+
+std::string Response::status_line(
+    StatusCode status_code,
+    std::string reason,
+    std::string version_major,
+    std::string version_minor)
+{
+    return "HTTP" + version_major + "." + version_minor + " " + etostr(status_code) + " " + reason + "\r\n";
+}
 
 std::ostream &operator<<(std::ostream &strm, const Response &response)
 {

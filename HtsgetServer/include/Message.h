@@ -33,7 +33,6 @@ public:
   //         std::vector<HeaderType> headers_;
   // }
 
-  using StatusCode = int;
   using HeaderNameType = std::string;
   using HeaderValueType = std::string;
   using HeaderType = std::pair<HeaderNameType, HeaderValueType>;
