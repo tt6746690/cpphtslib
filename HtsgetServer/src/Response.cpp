@@ -18,7 +18,7 @@ std::ostream &operator<<(std::ostream &strm, const Response &response)
         strm << "\t\t" << header << std::endl;
     }
 
-    strm << "Body    : " << std::endl;
+    strm << "Body    : " << response.body_ << std::endl;
 
     return strm;
 }

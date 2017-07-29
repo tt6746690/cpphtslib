@@ -20,7 +20,7 @@ std::ostream &operator<<(std::ostream &strm, const Request &request)
         strm << "\t" << header << std::endl;
     }
 
-    strm << "Body    : " << std::endl;
+    strm << "Body    : " << request.body_ << std::endl;
 
     return strm;
 }
