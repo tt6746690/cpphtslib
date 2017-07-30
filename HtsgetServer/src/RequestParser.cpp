@@ -396,4 +396,23 @@ auto RequestParser::view_state(RequestParser::State state, RequestParser::ParseS
 
     std::cout << std::endl;
 }
+
+auto operator<<(std::ostream &strm, RequestParser::ParseStatus &status) -> std::ostream &
+{
+    switch (status)
+    {
+    case RequestParser::ParseStatus::accept:
+        strm << "[Accept = ";
+        break;
+    case RequestParser::ParseStatus::reject:
+        strm << "[Reject = ";
+        break;
+    case RequestParser::ParseStatus::in_progress:
+        strm << "[In progress = ";
+        break;
+    default:
+        break;
+    }
+    return strm << etoint(status) << "]";
+}
 }

@@ -10,17 +10,41 @@
 namespace Http
 {
 
-static constexpr char unreserved_charset[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~";
-static constexpr char reserved_charset[] = "!*'();:@&=+$,/?#[]";
-static constexpr char uri_charset[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
-    "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
-    "?#[]";
-
 class RequestParser
 {
   public:
+    enum class ParseStatus;
+    enum class State;
+
+    explicit RequestParser() : state_(State::req_start){};
+
+    /**
+   * @brief Populate Request object given a Range of chars
+   */
+    template <typename InputIterator>
+    auto parse(Request &request, InputIterator begin, InputIterator end)
+        -> std::tuple<InputIterator, ParseStatus>
+    {
+        ParseStatus status;
+        while (begin != end)
+        {
+            status = consume(request, *begin++);
+            if (status == ParseStatus::accept || status == ParseStatus::reject)
+                break;
+        }
+        return {begin, status};
+    }
+
+    /**
+     * @brief   Advance parser state given input char
+     */
+    auto consume(Request &request, char c) -> ParseStatus;
+
+    static auto view_state(RequestParser::State state, RequestParser::ParseStatus status, char c) -> void;
+    State state_;
+
+    friend auto operator<<(std::ostream &strm, RequestParser::ParseStatus &status) -> std::ostream &;
+
     enum class ParseStatus
     {
         accept = 1,
@@ -51,33 +75,6 @@ class RequestParser
         req_header_lws,       // 19
         req_header_end        // 20
     };
-
-    explicit RequestParser() : state_(State::req_start){};
-
-    /**
-   * @brief Populate Request object given a Range of chars
-   */
-    template <typename InputIterator>
-    auto parse(Request &request, InputIterator begin, InputIterator end)
-        -> std::tuple<InputIterator, ParseStatus>
-    {
-        ParseStatus status;
-        while (begin != end)
-        {
-            status = consume(request, *begin++);
-            if (status == ParseStatus::accept || status == ParseStatus::reject)
-                break;
-        }
-        return {begin, status};
-    }
-
-    /**
-     * @brief   Advance parser state given input char
-     */
-    auto consume(Request &request, char c) -> ParseStatus;
-
-    static auto view_state(RequestParser::State state, RequestParser::ParseStatus status, char c) -> void;
-    State state_;
 
   private:
     /*
@@ -123,28 +120,13 @@ class RequestParser
     static constexpr bool is_uri(char c);
 };
 
-constexpr inline std::ostream &operator<<(std::ostream &strm,
-                                          RequestParser::ParseStatus &status)
-{
-    switch (status)
-    {
-    case RequestParser::ParseStatus::accept:
-        strm << "[Accept = ";
-        break;
-    case RequestParser::ParseStatus::reject:
-        strm << "[Reject = ";
-        break;
-    case RequestParser::ParseStatus::in_progress:
-        strm << "[In progress = ";
-        break;
-    default:
-        break;
-    }
-    return strm
-           << static_cast<std::underlying_type<RequestParser::ParseStatus>::type>(
-                  status)
-           << "]";
-}
+static constexpr char unreserved_charset[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~";
+static constexpr char reserved_charset[] = "!*'();:@&=+$,/?#[]";
+static constexpr char uri_charset[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
+    "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
+    "?#[]";
 }
 
 #endif
