@@ -12,19 +12,11 @@ using namespace Http;
 TEST_CASE("Enum StatusCode", "[Response]")
 {
     Response res;
-    REQUIRE(res.reason_ == "");
 
     SECTION("enum to int")
     {
-        res.status_code_ = Response::StatusCode::OK;
-        int OK = etoint(res.status_code_);
-        REQUIRE(OK == 200);
-
-        res.status_code_ = Response::StatusCode::Bad_Request;
-        int BAD_REQUEST = etoint(res.status_code_);
-        REQUIRE(BAD_REQUEST == 400);
-
-        /* Compile time evaluation */
+        REQUIRE(etoint(Response::StatusCode::OK) == 200);
+        REQUIRE(etoint(Response::StatusCode::Bad_Request) == 400);
         REQUIRE(Response::status_code(Response::StatusCode::Found) == 302);
     }
 

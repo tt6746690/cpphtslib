@@ -1,6 +1,7 @@
 #include <utility>
 #include <iostream>
 #include <cassert>
+#include <string>
 
 #include "Message.h"
 
@@ -25,5 +26,10 @@ auto Message::header_name(HeaderType &header) -> Message::HeaderNameType &
 auto Message::header_value(HeaderType &header) -> Message::HeaderValueType &
 {
     return std::get<1>(header);
+}
+
+auto Message::version(int major, int minor) -> std::string
+{
+    return std::to_string(major) + "." + std::to_string(minor);
 }
 }

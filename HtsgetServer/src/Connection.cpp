@@ -32,10 +32,10 @@ void Connection::read_payload()
         if (!ec)
         {
 
-#ifndef NDEBUG
+          // #ifndef NDEBUG
           std::cout << std::string{buffer_.data(),
                                    buffer_.data() + bytes_read};
-#endif
+          // #endif
 
           decltype(buffer_.begin()) begin;
           RequestParser::ParseStatus parse_status;
@@ -44,24 +44,25 @@ void Connection::read_payload()
               request_, buffer_.begin(), buffer_.begin() + bytes_read);
 
           /**
-       * Current buffer is fully read, branch on ParseStatus
-       *    -- in_progress, 
-       *        so continue do async read 
-       *    -- accept,
-       *        request header parsing finished
-       *    -- reject,
-       *        request has malformed syntax, send 400
-       */
+           * Current buffer is fully read, branch on ParseStatus
+           *    -- in_progress, 
+           *        so continue do async read 
+           *    -- accept,
+           *        request header parsing finished
+           *    -- reject,
+           *        request has malformed syntax, send 400
+           */
           switch (parse_status)
           {
           case RequestParser::ParseStatus::in_progress:
             read_payload();
             return;
           case RequestParser::ParseStatus::accept:
-            // start the route...
+            // handler start the roure.. for now just return statusline
+            response_.set_status_code(Response::StatusCode::OK);
             write_payload();
           case RequestParser::ParseStatus::reject:
-            // sets 400 to response
+            response_.set_status_code(Response::StatusCode::Not_Found);
             write_payload();
           default:
             return;
@@ -74,13 +75,12 @@ void Connection::write_payload()
 {
   asio::async_write(
       socket_,
-      asio::buffer(response_.payload_), asio::transfer_all(),
+      asio::buffer(response_.to_payload()), asio::transfer_all(),
       [ this, self = shared_from_this() ](std::error_code ec, std::size_t bytes_written) {
         if (!ec)
         {
           terminate();
         }
-        // connection shared_ptr goes out of scope, Connection lifetype ends here
       });
 }
 }

@@ -7,27 +7,35 @@
 namespace Http
 {
 
+auto Response::to_payload() const -> std::string
+{
+    return status_line();
+}
+
+void Response::set_status_code(StatusCode status_code)
+{
+    status_code_ = status_code;
+}
+
 auto Response::status_line() const -> std::string
 {
-    return "HTTP" + std::to_string(version_major_) + "." + std::to_string(version_minor_) + " " + etostr(status_code_) + " " + reason_ + "\r\n";
+    return status_line(status_code_, version_major_, version_minor_);
 };
 
 auto Response::status_line(
     StatusCode status_code,
-    std::string reason,
-    std::string version_major,
-    std::string version_minor) -> std::string
+    int http_version_major,
+    int http_version_minor) -> std::string
 {
-    return "HTTP" + version_major + "." + version_minor + " " + etostr(status_code) + " " + reason + "\r\n";
+    return "HTTP/" + version(http_version_major, http_version_minor) + " " +
+           std::to_string(Response::status_code(status_code)) + " " +
+           reason_phrase(status_code) + "\r\n";
 }
 
 std::ostream &
 operator<<(std::ostream &strm, const Response &response)
 {
-    strm << "Status  : " << response.status_code_ << std::endl
-         << "Reason  : " << response.reason_ << std::endl
-         << "Version : " << response.version_major_ << "." << response.version_minor_ << std::endl
-         << "Headers : " << std::endl;
+    strm << response.status_line() << std::endl;
 
     for (auto header : response.headers_)
     {
