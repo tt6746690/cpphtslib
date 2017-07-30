@@ -16,7 +16,7 @@ auto operator<<(std::ostream &strm, const std::pair<T1, T2> &p) -> std::ostream 
 
 template <typename T,
           typename std::enable_if<std::is_enum<T>::value>::type * = nullptr>
-auto etoint(const T value) -> typename std::underlying_type<T>::type
+auto constexpr etoint(const T value) -> typename std::underlying_type<T>::type
 {
     return static_cast<typename std::underlying_type<T>::type>(value);
 }

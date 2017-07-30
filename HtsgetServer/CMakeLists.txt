@@ -38,6 +38,7 @@ add_executable(server main.cpp ${SOURCE_FILES})
 set(TEST_FILES
     test/test_RequestParser.cpp
     test/test_Message.cpp
+    test/test_Response.cpp
 )
 
 add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})

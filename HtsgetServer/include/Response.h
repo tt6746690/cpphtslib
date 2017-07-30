@@ -2,7 +2,9 @@
 #define RESPONSE_H
 
 #include <array>
+
 #include "Message.h"
+#include "Utilities.h"
 
 namespace Http
 {
@@ -14,19 +16,17 @@ public:
   enum class StatusCode;
   enum class ResponseHeaderName;
 
-  // using StatusCode = int;
   /**
    * @brief   Gets status line 
    * 
    * Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
    */
-  std::string
-  status_line() const;
-  std::string static status_line(
+  auto status_line() const -> std::string;
+  auto static status_line(
       StatusCode status_code,
       std::string reason,
       std::string http_version_major = "1",
-      std::string http_version_minor = "1");
+      std::string http_version_minor = "1") -> std::string;
 
   StatusCode status_code_;
   std::string reason_;
@@ -123,6 +123,103 @@ public:
   };
 
   friend std::ostream &operator<<(std::ostream &strm, const Response &response);
+
+  auto static constexpr status_code(StatusCode status_code) -> int
+  {
+    return etoint(status_code);
+  }
+
+  /**
+   * @brief   Gets reason phrase given StatusCode
+   */
+  auto static constexpr reason_phrase(StatusCode status_code) -> char *
+  {
+    switch (status_code)
+    {
+    case Response::StatusCode::Continue:
+      return (char *)"Continue";
+    case Response::StatusCode::Switching_Protocols:
+      return (char *)"Switching Protocols";
+    case Response::StatusCode::OK:
+      return (char *)"OK";
+    case Response::StatusCode::Created:
+      return (char *)"Created";
+    case Response::StatusCode::Accepted:
+      return (char *)"Accepted";
+    case Response::StatusCode::Non_Authoritative_Information:
+      return (char *)"Non Authoritative Information";
+    case Response::StatusCode::No_Content:
+      return (char *)"No Content";
+    case Response::StatusCode::Reset_Content:
+      return (char *)"Reset Content";
+    case Response::StatusCode::Partial_Content:
+      return (char *)"Partial Content";
+    case Response::StatusCode::Multiple_Choices:
+      return (char *)"Multiple Choices";
+    case Response::StatusCode::Moved_Permanently:
+      return (char *)"Moved Permanently";
+    case Response::StatusCode::Found:
+      return (char *)"Found";
+    case Response::StatusCode::See_Other:
+      return (char *)"See Other";
+    case Response::StatusCode::Not_Modified:
+      return (char *)"Not Modified";
+    case Response::StatusCode::Use_Proxy:
+      return (char *)"Use Proxy";
+    case Response::StatusCode::Temporary_Redirect:
+      return (char *)"Temporary Redirect";
+    case Response::StatusCode::Bad_Request:
+      return (char *)"Bad Request";
+    case Response::StatusCode::Unauthorized:
+      return (char *)"Unauthorized";
+    case Response::StatusCode::Payment_Required:
+      return (char *)"Payment Required";
+    case Response::StatusCode::Forbidden:
+      return (char *)"Forbidden";
+    case Response::StatusCode::Not_Found:
+      return (char *)"Not Found";
+    case Response::StatusCode::Method_Not_Allowed:
+      return (char *)"Method Not Allowed";
+    case Response::StatusCode::Not_Acceptable:
+      return (char *)"Not Acceptable";
+    case Response::StatusCode::Proxy_Authentication_Required:
+      return (char *)"Proxy Authentication Required";
+    case Response::StatusCode::Request_Timeout:
+      return (char *)"Request Time-out";
+    case Response::StatusCode::Conflict:
+      return (char *)"Conflict";
+    case Response::StatusCode::Gone:
+      return (char *)"Gone";
+    case Response::StatusCode::Length_Required:
+      return (char *)"Length Required";
+    case Response::StatusCode::Precondition_Failed:
+      return (char *)"Precondition Failed";
+    case Response::StatusCode::Request_Entity_Too_Large:
+      return (char *)"Request Entity Too Large";
+    case Response::StatusCode::Request_URI_Too_Large:
+      return (char *)"Request URI Too Large";
+    case Response::StatusCode::Unsupported_Media_Type:
+      return (char *)"Unsurpported Media Type";
+    case Response::StatusCode::Requested_Range_Not_Satisfiable:
+      return (char *)"Requested Range Not Satisfiable";
+    case Response::StatusCode::Expectation_Failed:
+      return (char *)"Expectation Failed";
+    case Response::StatusCode::Internal_Server_Error:
+      return (char *)"Internal Sever Error";
+    case Response::StatusCode::Not_Implemented:
+      return (char *)"Not Implemented";
+    case Response::StatusCode::Bad_Gateway:
+      return (char *)"Bad Gateway";
+    case Response::StatusCode::Service_Unavailable:
+      return (char *)"Service Unavailable";
+    case Response::StatusCode::Gateway_Timeout:
+      return (char *)"Gateway Time-out";
+    case Response::StatusCode::HTTP_Version_Not_Supported:
+      return (char *)"HTTP Version Not Supported";
+    default:
+      return (char *)"";
+    }
+  }
 };
 }
 
