@@ -1,6 +1,81 @@
 
 
 
+### Planning 
+
+
++ _RequestRouter_ (mux)
+    + responsible for 
+        + determine the array of route handlers to execute
+    + handle HTTP request
+        + consists of path and callbacks (route handler), executed when a request's path matches
+    + impl 
+        + trie, a search tree to store dynamic set / associative array, where keys are strings
+            + `:name` in `router.params`
+            + `*filepath` catch all
+        + common prefixes, 
+    + some methods to impl 
+        + `func Handle(pattern string, handler Handler)`
+        + `func HandleFunc(pattern string, handler func(ResponseWriter, *Request))`
+        + `func ServeFile(w ResponseWriter, r *Request, name string)`
+        + `func SetCookie(w ResponseWriter, cookie *Cookie)`
+    + _handler_ 
+        + responds to an HTTP request
+            + write reply headers and data 
++ _connection_ 
+    + may have keep track of state for keep-alive ... 
+        + [link](https://golang.org/pkg/net/http/#ConnState)
++ _cookie_ 
+    + [link](https://golang.org/pkg/net/http/#Cookie)
++ _route_   
+    + defined based on matching path 
+        + match must be exact
+    + if tie exists, use handlers in order of execution
++ _handlers as templates_?
+    + Need 
+        + construction of middleware should be variadic, difficult to do without templates
+    + handlers are any callable given `Request` and `Response`
+        + lambdas, functors, so templates reconsile with the types
++ _middlewares_ 
+    + function that receives request + response 
+    + matching path is relative 
+        + act as internal nodes in the routes, 
+        + say `use('/usr')` matches `/usr` and `/usr/local`
++ _server_
+    + add 
+        + timeout for request-response loop 
+        + maxheaderbytes, maximum bytes when parsing http header before returning bad request
++ _request_ 
+     + represent HTTP request 
+        + method 
+        + url
+            + uri 
+            + query parameters
+        + protocol version 
+        + header, a map between field name and field value
+            + `Host` header (or from uri) promoted to `Request.host`    
+                + as `host:port`
+            + `ContentLength`
+            + `TransferEncoding`
+        + body 
+            + non-empty server side, return EOF if no body present
++ _response_
+    + represent response
+        + Status `200 OK`
+        + StatusCode `200`
+        + HTTP versions
+        + headers 
+        + body 
+        + compression ? 
++ _responsewriter_ 
+    + used by http handler to construct http response
+        + `writeHeader()`
+        + `write()` data to connection as part of HTTP reply
+            + calls `writeHeader(OK)` before writing 
+            + and sets `Content-Type` 
+            + reading request body before writing response
+
+
 ### Resources
 
 + configure include path for `c_cpp_properties.json` with `gcc -xc++ -E -v -`
@@ -8,6 +83,7 @@
 + custom service impl [discuz](https://stackoverflow.com/questions/23887056/trying-to-understand-boost-asio-custom-service-implementationls)
 + [HTTP/1.1 standard](https://www.w3.org/Protocols/rfc2616/rfc2616.html)
 + explanation on [`std::streambuf`](http://en.cppreference.com/w/cpp/io/basic_streambuf)
++ [go.http](https://golang.org/pkg/net/http/)
 
 
 ### Htsget [protocol](http://samtools.github.io/hts-specs/htsget.html)

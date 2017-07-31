@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include "Request.h"
+#include "Constants.h"
 
 namespace Http
 {
@@ -13,10 +14,11 @@ namespace Http
 class RequestParser
 {
   public:
-    enum class ParseStatus;
     enum class State;
 
     explicit RequestParser() : state_(State::req_start){};
+
+    State state_;
 
     /**
    * @brief Populate Request object given a Range of chars
@@ -40,17 +42,9 @@ class RequestParser
      */
     auto consume(Request &request, char c) -> ParseStatus;
 
-    static auto view_state(RequestParser::State state, RequestParser::ParseStatus status, char c) -> void;
-    State state_;
+    static auto view_state(RequestParser::State state, ParseStatus status, char c) -> void;
 
-    friend auto operator<<(std::ostream &strm, RequestParser::ParseStatus &status) -> std::ostream &;
-
-    enum class ParseStatus
-    {
-        accept = 1,
-        reject,
-        in_progress
-    };
+    friend auto operator<<(std::ostream &strm, ParseStatus &status) -> std::ostream &;
 
     enum class State
     {

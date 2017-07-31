@@ -13,19 +13,17 @@ TEST_CASE("Enum StatusCode", "[Response]")
 {
     Response res;
 
-    SECTION("enum to int")
+    SECTION("StatusCode enum to int")
     {
-        REQUIRE(etoint(Response::StatusCode::OK) == 200);
-        REQUIRE(etoint(Response::StatusCode::Bad_Request) == 400);
-        REQUIRE(Response::status_code(Response::StatusCode::Found) == 302);
+        REQUIRE(Response::status_code(StatusCode::Found) == 302);
     }
 
-    SECTION("enum to reason phrase")
+    SECTION("StatusCode enum to reason phrase")
     {
-        const char *OK = Response::reason_phrase(Response::StatusCode::OK);
+        const char *OK = Response::reason_phrase(StatusCode::OK);
         REQUIRE(OK == "OK");
 
-        std::string Bad_Request = Response::reason_phrase(Response::StatusCode::Bad_Request);
+        std::string Bad_Request = Response::reason_phrase(StatusCode::Bad_Request);
         REQUIRE(Bad_Request == "Bad Request");
     }
 }

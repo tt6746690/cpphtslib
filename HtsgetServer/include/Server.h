@@ -41,6 +41,9 @@ private:
   asio::ip::tcp::acceptor acceptor_;
   asio::ip::tcp::socket socket_;
 
+  // configs
+  constexpr static int max_header_bytes = 1 << 20; // 1MB
+
   void accept_connection();
 };
 }

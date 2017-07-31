@@ -54,7 +54,7 @@ namespace Http
 auto RequestParser::consume(Request &request, char c) -> ParseStatus
 {
     using s = RequestParser::State;
-    using status = RequestParser::ParseStatus;
+    using status = ParseStatus;
 
     switch (state_)
     {
@@ -368,7 +368,7 @@ constexpr bool RequestParser::is_uri(char c)
     return false;
 }
 
-auto RequestParser::view_state(RequestParser::State state, RequestParser::ParseStatus status, char c) -> void
+auto RequestParser::view_state(RequestParser::State state, ParseStatus status, char c) -> void
 {
     std::cout << "state: " << etoint(state)
               << "\tstatus: " << status
@@ -397,17 +397,17 @@ auto RequestParser::view_state(RequestParser::State state, RequestParser::ParseS
     std::cout << std::endl;
 }
 
-auto operator<<(std::ostream &strm, RequestParser::ParseStatus &status) -> std::ostream &
+auto operator<<(std::ostream &strm, ParseStatus &status) -> std::ostream &
 {
     switch (status)
     {
-    case RequestParser::ParseStatus::accept:
+    case ParseStatus::accept:
         strm << "[Accept = ";
         break;
-    case RequestParser::ParseStatus::reject:
+    case ParseStatus::reject:
         strm << "[Reject = ";
         break;
-    case RequestParser::ParseStatus::in_progress:
+    case ParseStatus::in_progress:
         strm << "[In progress = ";
         break;
     default:

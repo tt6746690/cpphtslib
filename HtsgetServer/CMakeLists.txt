@@ -29,6 +29,7 @@ set(SOURCE_FILES
     include/RequestParser.h 
     include/Response.h 
     include/Utilities.h
+    include/Constants.h
 )
 
 add_executable(server main.cpp ${SOURCE_FILES})

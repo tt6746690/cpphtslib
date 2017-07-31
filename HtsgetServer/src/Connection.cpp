@@ -4,7 +4,8 @@
 #include "asio.hpp"
 
 #include "Connection.h"
-#include "RequestParser.h" // RequestParser::ParseStatus
+#include "RequestParser.h"
+#include "Constants.h"
 
 using namespace std;
 
@@ -38,10 +39,12 @@ void Connection::read_payload()
           // #endif
 
           decltype(buffer_.begin()) begin;
-          RequestParser::ParseStatus parse_status;
+          ParseStatus parse_status;
 
           std::tie(begin, parse_status) = request_parser_.parse(
               request_, buffer_.begin(), buffer_.begin() + bytes_read);
+
+          std::cout << request_.request_method(RequestMethod::GET);
 
           /**
            * Current buffer is fully read, branch on ParseStatus
@@ -54,15 +57,15 @@ void Connection::read_payload()
            */
           switch (parse_status)
           {
-          case RequestParser::ParseStatus::in_progress:
+          case ParseStatus::in_progress:
             read_payload();
             return;
-          case RequestParser::ParseStatus::accept:
+          case ParseStatus::accept:
             // handler start the roure.. for now just return statusline
-            response_.set_status_code(Response::StatusCode::OK);
+            response_.set_status_code(StatusCode::OK);
             write_payload();
-          case RequestParser::ParseStatus::reject:
-            response_.set_status_code(Response::StatusCode::Not_Found);
+          case ParseStatus::reject:
+            response_.set_status_code(StatusCode::Not_Found);
             write_payload();
           default:
             return;

@@ -6,6 +6,7 @@
 
 #include "RequestParser.h"
 #include "Request.h"
+#include "Constants.h"
 
 using namespace Http;
 
