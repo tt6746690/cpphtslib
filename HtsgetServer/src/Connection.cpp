@@ -44,7 +44,7 @@ void Connection::read_payload()
           std::tie(begin, parse_status) = request_parser_.parse(
               request_, buffer_.begin(), buffer_.begin() + bytes_read);
 
-          std::cout << request_.request_method(RequestMethod::GET);
+          std::cout << request_ << std::endl;
 
           /**
            * Current buffer is fully read, branch on ParseStatus

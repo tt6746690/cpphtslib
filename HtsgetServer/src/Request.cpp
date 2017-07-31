@@ -10,17 +10,13 @@ namespace Http
 
 std::ostream &operator<<(std::ostream &strm, const Request &request)
 {
-    strm << "Method  : " << request.method_ << std::endl
-         << "Uri     : " << request.uri_ << std::endl
-         << "Version : " << request.version_major_ << "." << request.version_minor_ << std::endl
-         << "Headers : " << std::endl;
-
+    strm << request.method_ << " " << request.uri_ << " "
+         << Message::version(request.version_major_, request.version_minor_) << std::endl;
     for (auto header : request.headers_)
     {
-        strm << "\t" << header << std::endl;
+        strm << header << std::endl;
     }
-
-    strm << "Body    : " << request.body_ << std::endl;
+    strm << "body: " << request.body_ << std::endl;
 
     return strm;
 }

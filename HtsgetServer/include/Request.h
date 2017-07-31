@@ -12,13 +12,13 @@ class Request : public Message
 {
 
 public:
-  std::string method_;
-  std::string uri_;
-
-  inline const char *request_method(RequestMethod method)
+  constexpr static const char *request_method(RequestMethod method)
   {
     return enum_map(request_methods, method);
   }
+
+  std::string method_;
+  std::string uri_;
 
   friend std::ostream &operator<<(std::ostream &strm, const Request &request);
 };

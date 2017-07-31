@@ -31,13 +31,25 @@ public:
   static auto header_value(HeaderType &header) -> HeaderValueType &;
 
   /**
+   * @brief   Sets header with given name and value
+   * 
+   * Overwrites existing header if name matches, 
+   * otherwise create new header name/value pair
+   */
+  void header_set(HeaderNameType name, HeaderValueType value);
+  /**
+   * @brief   Removes header with given name
+   */
+  void header_unset(HeaderNameType name);
+
+  /**
    * @brief   Return HTTP version 
    */
   static auto version(int major, int minor) -> std::string;
 
   int version_major_;
   int version_minor_;
-  std::list<HeaderType> headers_;
+  std::vector<HeaderType> headers_;
   std::string body_;
 };
 }

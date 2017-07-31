@@ -32,4 +32,34 @@ TEST_CASE("Message::Manipulate header member", "[Message]")
         msg.build_header_value('e');
         REQUIRE(msg.headers_.back().second == "value");
     }
+
+    SECTION("manipulate headers")
+    {
+        msg.header_set("foo", "bar");
+        msg.header_set("bar", "baz");
+        REQUIRE(msg.headers_.size() == 3);
+
+        SECTION("header_set")
+        {
+            msg.header_set("foo", "barbar");
+            REQUIRE(msg.headers_.size() == 3);
+
+            auto found = std::find_if(msg.headers_.begin(), msg.headers_.end(), [](auto &header) {
+                return header.first == "foo";
+            });
+            REQUIRE(found != msg.headers_.end());
+            REQUIRE(found->second == "barbar");
+        }
+
+        SECTION("header_unset")
+        {
+            msg.header_unset("foo");
+            REQUIRE(msg.headers_.size() == 2);
+
+            auto found = std::find_if(msg.headers_.begin(), msg.headers_.end(), [](auto &header) {
+                return header.first == "foo";
+            });
+            REQUIRE(found == msg.headers_.end());
+        }
+    }
 }
