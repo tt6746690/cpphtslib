@@ -36,14 +36,10 @@ std::ostream &
 operator<<(std::ostream &strm, const Response &response)
 {
     strm << response.status_line() << std::endl;
-
     for (auto header : response.headers_)
     {
         strm << "\t\t" << header << std::endl;
     }
-
-    strm << "Body    : " << response.body_ << std::endl;
-
-    return strm;
+    return strm << "Body    : " << response.body_ << std::endl;
 }
 }
