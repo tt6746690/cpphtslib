@@ -21,37 +21,69 @@ public:
    */
   auto
   to_payload() const -> std::string;
+
   /**
-   * @brief   Sets status code for response
+   * @brief   gets/Sets status code for response
    */
-  void set_status_code(StatusCode status_code);
+  auto status_code() -> StatusCode;
+  void status_code(StatusCode status_code);
 
-private:
-  StatusCode status_code_;
-
-public:
+  /**
+   * @brief   Gets reason phrase for this instance
+   */
+  auto reason_phrase() -> std::string;
   /**
    * @brief   Gets status line 
    * 
    * Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
    */
   auto status_line() const -> std::string;
-  auto static status_line(
+  auto static to_status_line(
       StatusCode status_code,
       int http_version_major = 1,
       int http_version_minor = 1) -> std::string;
 
   /**
+     * @brief   Gets/Sets commonly used headers 
+     */
+  auto content_length() -> int;
+  void content_length(int);
+  auto content_type() -> HeaderValueType;
+  void content_type(HeaderValueType);
+
+  /**
+   * @brief   Write to body
+   * 
+   * Types: 
+   *    string
+   *        sets content-type to text/html or text/plain
+   *        sets content-length
+   *    buffer, 
+   *        sets content-type to application/octet-stream
+   *        sets content-length
+   *    stream, 
+   *        sets content-type to application/octet-stream
+   *    json, 
+   *        sets content-type to application/json
+   */
+  void
+  write(std::string string);
+
+private:
+  StatusCode status_code_ = StatusCode::OK; // defaults to 200 OK
+
+public:
+  /**
    * @brief   Gets numeric status code given StatusCode
    */
-  auto static constexpr status_code(StatusCode status_code) -> int
+  auto static constexpr status_code_to_int(StatusCode status_code) -> int
   {
     return enum_map(status_codes, status_code);
   }
   /**
    * @brief   Gets reason phrase given StatusCode
    */
-  auto static constexpr reason_phrase(StatusCode status_code) -> char *
+  auto static constexpr status_code_to_reason(StatusCode status_code) -> char *
   {
     return enum_map(reason_phrases, status_code);
   }

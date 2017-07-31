@@ -62,11 +62,11 @@ void Connection::read_payload()
             return;
           case ParseStatus::accept:
             // handler start the roure.. for now just return statusline
-            response_.set_status_code(StatusCode::OK);
+            response_.status_code(StatusCode::OK);
             write_payload();
             return;
           case ParseStatus::reject:
-            response_.set_status_code(StatusCode::Not_Found);
+            response_.status_code(StatusCode::Not_Found);
             write_payload();
             return;
           default:

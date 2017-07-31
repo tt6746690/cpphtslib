@@ -1,4 +1,5 @@
 #include <iterator>
+#include <utility>
 #include "catch.hpp"
 
 #include "Message.h"
@@ -35,13 +36,26 @@ TEST_CASE("Message::Manipulate header member", "[Message]")
 
     SECTION("manipulate headers")
     {
-        msg.header_set("foo", "bar");
-        msg.header_set("bar", "baz");
+        msg.set_header("foo", "bar");
+        msg.set_header("bar", "baz");
         REQUIRE(msg.headers_.size() == 3);
 
-        SECTION("header_set")
+        SECTION("get_header")
         {
-            msg.header_set("foo", "barbar");
+            Response::HeaderValueType val;
+            bool found;
+
+            std::tie(val, found) = msg.get_header("foo");
+            REQUIRE(val == "bar");
+            REQUIRE(found == true);
+
+            std::tie(val, found) = msg.get_header("not_in_header");
+            REQUIRE(found == false);
+        }
+
+        SECTION("set_header")
+        {
+            msg.set_header("foo", "barbar");
             REQUIRE(msg.headers_.size() == 3);
 
             auto found = std::find_if(msg.headers_.begin(), msg.headers_.end(), [](auto &header) {
@@ -51,9 +65,9 @@ TEST_CASE("Message::Manipulate header member", "[Message]")
             REQUIRE(found->second == "barbar");
         }
 
-        SECTION("header_unset")
+        SECTION("unset_header")
         {
-            msg.header_unset("foo");
+            msg.unset_header("foo");
             REQUIRE(msg.headers_.size() == 2);
 
             auto found = std::find_if(msg.headers_.begin(), msg.headers_.end(), [](auto &header) {

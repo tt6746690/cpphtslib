@@ -15,15 +15,15 @@ TEST_CASE("Enum StatusCode", "[Response]")
 
     SECTION("StatusCode enum to int")
     {
-        REQUIRE(Response::status_code(StatusCode::Found) == 302);
+        REQUIRE(Response::status_code_to_int(StatusCode::Found) == 302);
     }
 
     SECTION("StatusCode enum to reason phrase")
     {
-        const char *OK = Response::reason_phrase(StatusCode::OK);
+        const char *OK = Response::status_code_to_reason(StatusCode::OK);
         REQUIRE(OK == "OK");
 
-        std::string Bad_Request = Response::reason_phrase(StatusCode::Bad_Request);
+        std::string Bad_Request = Response::status_code_to_reason(StatusCode::Bad_Request);
         REQUIRE(Bad_Request == "Bad Request");
     }
 }

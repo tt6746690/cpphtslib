@@ -24,33 +24,39 @@ public:
   void build_header_name(char c);
   void build_header_value(char c);
 
-  /** 
-   * @brief   Given a header, return its name/value
+  /**
+   * @brief   Gets header with given name 
    */
-  static auto header_name(HeaderType &header) -> HeaderNameType &;
-  static auto header_value(HeaderType &header) -> HeaderValueType &;
-
+  auto get_header(HeaderNameType name) -> std::pair<HeaderValueType, bool>;
   /**
    * @brief   Sets header with given name and value
    * 
    * Overwrites existing header if name matches, 
-   * otherwise create new header name/value pair
+   * otherwise appends header to end of headers_
    */
-  void header_set(HeaderNameType name, HeaderValueType value);
+  void set_header(HeaderNameType name, HeaderValueType value);
   /**
    * @brief   Removes header with given name
    */
-  void header_unset(HeaderNameType name);
-
-  /**
-   * @brief   Return HTTP version 
-   */
-  static auto version(int major, int minor) -> std::string;
+  void unset_header(HeaderNameType name);
 
   int version_major_;
   int version_minor_;
   std::vector<HeaderType> headers_;
   std::string body_;
+
+public:
+  /**
+   * @brief   Return HTTP version 
+   */
+  static auto
+  version(int major, int minor) -> std::string;
+
+  /** 
+   * @brief   Given a header, return its name/value
+   */
+  static auto header_name(HeaderType &header) -> HeaderNameType &;
+  static auto header_value(HeaderType &header) -> HeaderValueType &;
 };
 }
 #endif

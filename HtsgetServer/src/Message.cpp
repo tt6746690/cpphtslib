@@ -29,7 +29,20 @@ auto Message::header_value(HeaderType &header) -> Message::HeaderValueType &
     return std::get<1>(header);
 }
 
-void Message::header_set(HeaderNameType name, HeaderValueType value)
+auto Message::get_header(HeaderNameType name) -> std::pair<HeaderValueType, bool>
+{
+    HeaderValueType val{};
+    bool valid = false;
+
+    for (auto &header : headers_)
+    {
+        if (header.first == name)
+            val = header.second, valid = true;
+    }
+    return std::make_pair(val, valid);
+}
+
+void Message::set_header(HeaderNameType name, HeaderValueType value)
 {
     auto header = std::make_pair(name, value);
     auto found = find_if(headers_.begin(), headers_.end(),
@@ -42,7 +55,7 @@ void Message::header_set(HeaderNameType name, HeaderValueType value)
         headers_.push_back(header);
 }
 
-void Message::header_unset(HeaderNameType name)
+void Message::unset_header(HeaderNameType name)
 {
     auto end = std::remove_if(headers_.begin(), headers_.end(),
                               [&](auto &header) {
