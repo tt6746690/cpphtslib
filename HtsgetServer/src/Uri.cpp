@@ -1,3 +1,5 @@
+#include <ostream>
+
 #include "Uri.h"
 #include "Constants.h"
 #include "Utilities.h"
@@ -114,9 +116,30 @@ auto Uri::consume(char c) -> ParseStatus
         }
         query_.push_back(c);
         return ParseStatus::in_progress;
+    case UriState::uri_fragment:
+        fragment_.push_back(c);
+        return ParseStatus::in_progress;
     default:
         break;
     }
     return ParseStatus::reject;
 };
+
+/* 
+    "http:" "//" host [ ":" port ] [ abs_path [ "?" query ]]
+*/
+auto operator<<(std::ostream &strm, Uri uri) -> std::ostream &
+{
+    if (uri.scheme_.size())
+        strm << uri.scheme_ + "://" + uri.host_;
+    if (uri.port_.size())
+        strm << ":" << uri.port_;
+    if (uri.abs_path_.size())
+        strm << uri.abs_path_;
+    if (uri.query_.size())
+        strm << "?" << uri.query_;
+    if (uri.fragment_.size())
+        strm << "#" << uri.fragment_;
+    return strm;
+}
 }

@@ -114,13 +114,13 @@ auto RequestParser::consume(Request &request, char c) -> ParseStatus
                 {
                 case 'O':
                     request.method_ = RequestMethod::POST;
-                    break;
+                    return status::in_progress;
                 case 'U':
                     request.method_ = RequestMethod::PUT;
-                    break;
+                    return status::in_progress;
                 case 'A':
                     request.method_ = RequestMethod::PATCH;
-                    break;
+                    return status::in_progress;
                 default:
                     return status::reject;
                 }

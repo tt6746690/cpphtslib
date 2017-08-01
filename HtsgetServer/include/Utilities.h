@@ -14,7 +14,7 @@ namespace Http
 template <typename T1, typename T2>
 auto operator<<(std::ostream &strm, const std::pair<T1, T2> &p) -> std::ostream &
 {
-    return strm << "[" << p.first << ", " << p.second << "]" << std::endl;
+    return strm << p.first << ": " << p.second;
 }
 
 /**

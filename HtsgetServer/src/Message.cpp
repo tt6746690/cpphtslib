@@ -11,7 +11,7 @@ namespace Http
 
 auto Message::version(int major, int minor) -> std::string
 {
-    return std::to_string(major) + "." + std::to_string(minor);
+    return "HTTP/" + std::to_string(major) + "." + std::to_string(minor);
 }
 
 void Message::build_header_name(char c)
@@ -103,5 +103,10 @@ auto Message::content_type() -> HeaderValueType
 void Message::content_type(HeaderValueType value)
 {
     set_header("Content-Type", value);
+}
+
+auto operator<<(std::ostream &strm, Message::HeaderType &header) -> std::ostream &
+{
+    return strm << Message::header_name(header) << ": " << Message::header_value(header) << std::endl;
 }
 }

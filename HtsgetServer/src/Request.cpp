@@ -10,7 +10,7 @@ namespace Http
 
 std::ostream &operator<<(std::ostream &strm, const Request &request)
 {
-    strm << request.method_ << " " << request.uri_.url_ << " "
+    strm << Request::request_method_to_string(request.method_) << " " << request.uri_ << " "
          << Message::version(request.version_major_, request.version_minor_) << std::endl;
     for (auto header : request.headers_)
     {

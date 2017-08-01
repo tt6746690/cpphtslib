@@ -2,6 +2,7 @@
 #define URI_H
 
 #include <string>
+#include <ostream>
 
 #include "Constants.h"
 
@@ -14,7 +15,7 @@ public:
   /* Assume only accepting Url for now*/
   std::string url_;
   std::string scheme_;
-  std::string host_; // host or host:port
+  std::string host_;
   std::string port_;
   std::string abs_path_;
   std::string query_;
@@ -28,6 +29,8 @@ public:
    * @precondition  c is valid uri char
    */
   auto consume(char c) -> ParseStatus;
+
+  friend auto operator<<(std::ostream &strm, Uri uri) -> std::ostream &;
 };
 }
 

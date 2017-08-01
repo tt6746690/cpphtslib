@@ -16,7 +16,7 @@ public:
   RequestMethod method_ = RequestMethod::UNDETERMINED;
   Uri uri_;
 
-  constexpr static const char *request_method(RequestMethod method)
+  constexpr static const char *request_method_to_string(RequestMethod method)
   {
     return enum_map(request_methods, method);
   };

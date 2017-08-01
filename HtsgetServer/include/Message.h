@@ -1,6 +1,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
+#include <ostream>
 #include <utility> // pair
 #include <vector>
 #include <list>
@@ -65,6 +66,8 @@ public:
    */
   static auto header_name(HeaderType &header) -> HeaderNameType &;
   static auto header_value(HeaderType &header) -> HeaderValueType &;
+
+  friend auto operator<<(std::ostream &strm, HeaderType) -> std::ostream &;
 };
 }
 #endif
