@@ -44,14 +44,6 @@ public:
       int http_version_minor = 1) -> std::string;
 
   /**
-     * @brief   Gets/Sets commonly used headers 
-     */
-  auto content_length() -> int;
-  void content_length(int);
-  auto content_type() -> HeaderValueType;
-  void content_type(HeaderValueType);
-
-  /**
    * @brief   Write to body
    * 
    * Types: 
@@ -76,14 +68,14 @@ public:
   /**
    * @brief   Gets numeric status code given StatusCode
    */
-  auto static constexpr status_code_to_int(StatusCode status_code) -> int
+  static auto constexpr status_code_to_int(StatusCode status_code) -> int
   {
     return enum_map(status_codes, status_code);
   }
   /**
    * @brief   Gets reason phrase given StatusCode
    */
-  auto static constexpr status_code_to_reason(StatusCode status_code) -> char *
+  static auto constexpr status_code_to_reason(StatusCode status_code) -> char *
   {
     return enum_map(reason_phrases, status_code);
   }

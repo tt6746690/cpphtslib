@@ -4,6 +4,7 @@
 
 #include "Message.h"
 #include "Utilities.h"
+#include "Response.h"
 
 using namespace Http;
 

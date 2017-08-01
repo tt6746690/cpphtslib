@@ -40,6 +40,14 @@ public:
    */
   void unset_header(HeaderNameType name);
 
+  /**
+     * @brief   Gets/Sets commonly used headers 
+     */
+  auto content_length() -> int;
+  void content_length(int length);
+  auto content_type() -> HeaderValueType;
+  void content_type(HeaderValueType value);
+
   int version_major_;
   int version_minor_;
   std::vector<HeaderType> headers_;

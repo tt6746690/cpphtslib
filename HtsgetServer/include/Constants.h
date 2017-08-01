@@ -4,6 +4,35 @@
 namespace Http
 {
 
+/** 
+ * static strings 
+ */
+
+static constexpr char unreserved_charset[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~";
+static constexpr char reserved_charset[] = "!*'();:@&=+$,/?#[]";
+static constexpr char uri_charset[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
+    "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
+    "?#[]";
+
+/**
+ * Uri
+ */
+
+enum class UriState
+{
+    uri_start,
+    uri_scheme,
+    uri_slash,
+    uri_slash_shash,
+    uri_host,
+    uri_port,
+    uri_abs_path,
+    uri_query,
+    uri_fragment
+};
+
 /**
  * RequestParser
  */
@@ -28,7 +57,8 @@ enum class RequestMethod
     DELETE,
     CONNECT,
     OPTIONS,
-    TRACE
+    TRACE,
+    UNDETERMINED
 };
 
 enum class RequestHeaderName

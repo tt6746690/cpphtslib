@@ -97,30 +97,7 @@ class RequestParser
                      | "/" | "[" | "]" | "?" | "="
                      | "{" | "}" | SP | HT
   */
-
-    static constexpr bool is_char(char c);
-    static constexpr bool is_upperalpha(char c);
-    static constexpr bool is_loweralpha(char c);
-    static constexpr bool is_alpha(char c);
-    static constexpr bool is_digit(char c);
-    static constexpr bool is_ctl(char c);
-    static constexpr bool is_cr(char c);
-    static constexpr bool is_lf(char c);
-    static constexpr bool is_crlf(char c);
-    static constexpr bool is_sp(char c);
-    static constexpr bool is_ht(char c);
-    static constexpr bool is_separator(char c);
-    static constexpr bool is_token(char c);
-    static constexpr bool is_uri(char c);
 };
-
-static constexpr char unreserved_charset[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~";
-static constexpr char reserved_charset[] = "!*'();:@&=+$,/?#[]";
-static constexpr char uri_charset[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
-    "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
-    "?#[]";
 }
 
 #endif

@@ -22,6 +22,7 @@ set(SOURCE_FILES
     src/RequestParser.cpp
     src/Response.cpp
     src/Utilities.cpp
+    src/Uri.cpp
     include/Server.h
     include/Connection.h 
     include/Message.h 
@@ -29,6 +30,7 @@ set(SOURCE_FILES
     include/RequestParser.h 
     include/Response.h 
     include/Utilities.h
+    include/Uri.h
     include/Constants.h
 )
 

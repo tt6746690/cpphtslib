@@ -43,42 +43,6 @@ auto Response::to_status_line(
            status_code_to_reason(status_code) + "\r\n";
 }
 
-auto Response::content_length() -> int
-{
-    Response::HeaderValueType val = "";
-    bool found;
-    std::tie(val, found) = get_header("Content-Length");
-
-    if (found)
-        return std::atoi(val.c_str());
-    else
-        set_header("Content-Length", "0");
-    return 0;
-}
-
-void Response::content_length(int length)
-{
-    set_header("Content-Length", std::to_string(length));
-}
-
-auto Response::content_type() -> HeaderValueType
-{
-    Response::HeaderValueType val = "";
-    bool found;
-    std::tie(val, found) = get_header("Content-Type");
-
-    if (found)
-        return val;
-    else
-        set_header("Content-Type", "");
-    return "";
-}
-
-void Response::content_type(HeaderValueType value)
-{
-    set_header("Content-Type", value);
-}
-
 std::ostream &
 operator<<(std::ostream &strm, const Response &response)
 {

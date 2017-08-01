@@ -9,6 +9,11 @@
 namespace Http
 {
 
+auto Message::version(int major, int minor) -> std::string
+{
+    return std::to_string(major) + "." + std::to_string(minor);
+}
+
 void Message::build_header_name(char c)
 {
     assert(headers_.size() != 0);
@@ -36,8 +41,8 @@ auto Message::get_header(HeaderNameType name) -> std::pair<HeaderValueType, bool
 
     for (auto &header : headers_)
     {
-        if (header.first == name)
-            val = header.second, valid = true;
+        if (header_name(header) == name)
+            val = header_value(header), valid = true;
     }
     return std::make_pair(val, valid);
 }
@@ -64,8 +69,39 @@ void Message::unset_header(HeaderNameType name)
     headers_.erase(end, headers_.end());
 }
 
-auto Message::version(int major, int minor) -> std::string
+auto Message::content_length() -> int
 {
-    return std::to_string(major) + "." + std::to_string(minor);
+    HeaderValueType val = "";
+    bool found;
+    std::tie(val, found) = get_header("Content-Length");
+
+    if (found)
+        return std::atoi(val.c_str());
+    else
+        set_header("Content-Length", "0");
+    return 0;
+}
+
+void Message::content_length(int length)
+{
+    set_header("Content-Length", std::to_string(length));
+}
+
+auto Message::content_type() -> HeaderValueType
+{
+    HeaderValueType val = "";
+    bool found;
+    std::tie(val, found) = get_header("Content-Type");
+
+    if (found)
+        return val;
+    else
+        set_header("Content-Type", "");
+    return "";
+}
+
+void Message::content_type(HeaderValueType value)
+{
+    set_header("Content-Type", value);
 }
 }
