@@ -23,6 +23,8 @@ set(SOURCE_FILES
     src/Response.cpp
     src/Utilities.cpp
     src/Uri.cpp
+    src/Router.cpp
+    src/Trie.cpp
     include/Server.h
     include/Connection.h 
     include/Message.h 
@@ -32,6 +34,8 @@ set(SOURCE_FILES
     include/Utilities.h
     include/Uri.h
     include/Constants.h
+    include/Router.h
+    include/Trie.h
 )
 
 add_executable(server main.cpp ${SOURCE_FILES})
