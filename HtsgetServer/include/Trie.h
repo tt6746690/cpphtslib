@@ -3,206 +3,143 @@
 
 #include <string>
 #include <utility>
-#include <unordered_map>
-#include <list>
+#include <bitset>
 #include <vector>
 #include <cstddef>
 #include <iterator>
+#include <unordered_map>
+#include <array>
+#include <memory>
+#include <ostream>
+
+#include <sparsepp/spp.h>
+
+#include <Utilities.h>
 
 namespace Http
 {
 
+constexpr size_t uri_charset_size = constexpr_strlen(uri_charset);
+constexpr size_t radix = 16;
+
 template <typename T>
 class Trie
 {
-  public:
-    class TrieNode;
-    class TrieIterator;
-    class TrieConstIterator;
+public:
+  struct TrieNode;
 
-    using key_type = std::string;
-    using mapped_type = T;
-    using value_type = std::pair<const key_type, T>;
-    using size_type = std::size_t;
-    using difference_type = std::ptrdiff_t;
-    using reference = value_type &;
-    using const_reference = const value_type &;
-    using pointer = value_type *;
-    using const_pointer = const value_type *;
-    // using iterator = TrieIterator;
-    // using const_iterator = TrieIterator;
-    using iterator = TrieNode *;
-    using const_iterator = const TrieNode *;
+  using key_type = std::string;
+  using mapped_type = T;
+  using value_type = std::pair<const key_type, T>;
+  using reference = value_type &;
+  using const_reference = const value_type &;
+  using iterator = TrieNode *;
+  using const_iterator = const TrieNode *;
 
-  public:
-    // class TrieIterator : public std::iterator<
-    //                          std::bidirectional_iterator_tag, // Category
-    //                          value_type                       // value_type
-    //                          >
-    // {
-    //   public:
-    //     explicit TrieIterator()
-    //         : iterator_(nullptr){};
+  using node_ptr = TrieNode *;
+  using uniq_node_ptr = std::unique_ptr<TrieNode>;
 
-    //     TrieIterator &operator++() // pre-increment
-    //     {
-    //         assert(iterator_ != nullptr);
-    //         return *iterator_;
-    //     }
-    //     TrieIteratro &operator++(int) // post-increment
-    //     {
-    //         assert(iterator_ != nullptr);
-    //     }
-    //     bool operator==(const TrieIterator &rhs) const
-    //     {
-    //         return iterator_ == rhs.iterator_;
-    //     }
-    //     bool operator!=(const TrieIterator &rhs) const
-    //     {
-    //         return !(iterator_ == rhs.iterator_);
-    //     }
-    //     reference operator*() const { return iterator_->data_; }
+public:
+  /**
+ * @brief   Node of a Trie
+ * 
+ * @param   data_       auxiliary data 
+ *                      internal node:  may or may not contain data_
+ *                      leaf node: must has valid data_
+ * @param   parent_     pointer to parent node, nullptr for root_
+ * @param   child_      a mapping of prefixes and pointers to associated nodes 
+ */
+  struct TrieNode
+  {
+    using node_ptr = TrieNode *;
+    using uniq_node_ptr = std::unique_ptr<TrieNode>;
 
-    //   private:
-    //     TrieNode *iterator_;
-    // };
+    T data_;
+    node_ptr parent_ = nullptr;
+    std::unordered_map<std::string, uniq_node_ptr> child_;
 
-    /**
-     * @brief   Node of a Trie
-     * 
-     * @param   prefix_     prefix string of edge from parent_
-     * @param   data_       auxiliary data 
-     *                      internal node:  may or may not contain data_
-     *                      leaf node: must has valid data_
-     * @param   parent_     pointer to parent node, nullptr for root_
-     * @param   child_      pointer to first child
-     * @param   next_       pointer to the next sibling
-     */
-    class TrieNode
+    TrieNode(T data = T(), node_ptr parent = nullptr)
+        : data_(data), parent_(parent){};
+  };
+
+  Trie()
+      : root_(std::make_unique<TrieNode>("/")), size_(0){};
+
+  /**
+   * @brief   Find a TrieNode in Trie rooted at node 
+   *          with key equivalent to key, If no exact match, 
+   *          Return the last node with a common prefix
+   */
+  auto static find_in(std::string &key, node_ptr node) -> node_ptr
+  {
+    if (!key.size())
+      return node;
+
+    for (int i = 1; i < key.size(); i++)
     {
-      public:
-        using node_ptr = TrieNode *;
+      auto found = node->child_.find(key.substr(0, i));
+      if (found != node->child_.end())
+      {
+        key = key.substr(i);
+        return find_in(key, (found->second).get());
+      }
+    }
+    return node;
+  }
+  auto find(const value_type &value) -> std::pair<node_ptr, std::string>
+  {
+    std::string key{value.first};
+    return std::make_pair(find_in(key, root_.get()), key);
+  }
 
-      public:
-        std::string prefix_;
-        mapped_type data_;
+  /**
+   * @brief   Inserts data to Trie given key 
+   */
+  auto insert(const value_type &value) -> node_ptr
+  {
+    if (!root_->child_.size())
+    {
+      root_->child_.emplace(
+          std::make_pair(value.first, newNode(value, root_.get())));
+      return root_.get();
+    }
 
-        TrieNode *parent_;
-        TrieNode *child_;
-        TrieNode *next_;
+    node_ptr node;
+    std::string suffix;
+    std::tie(node, suffix) = find(value);
 
-        TrieNode(std::string prefix, const T &data,
-                 TrieNode *parent = nullptr, TrieNode *child = nullptr, TrieNode *next = nullptr)
-            : prefix_(prefix), data_(data), parent_(parent), child_(child), next_(next){};
+    node->child_.emplace(
+        std::make_pair(suffix, newNode(value, node)));
 
-        bool operator==(const TrieNode &rhs) const
-        {
-            return (data_ == rhs.data_) &&
-                   (prefix_ == rhs.prefix_) &&
-                   (parent_ == rhs.parent_) &&
-                   (child_ == rhs.child_);
-        }
-        bool operator!=(const TrieNode &rhs) const
-        {
-            return !(this == data_);
-        }
-        reference operator*() const
-        {
-            return data_;
-        }
-        /**
-         * @brief   Find last node in the linked list of nodes
-         */
-        static TrieNode &last(TrieNode &node)
-        {
-            while (node.next_)
-                node = node.next_;
-            return node;
-        }
-        /**
-         * @brief   Find minimum/maximum of TrieNode in Trie
-         */
-        static TrieNode &minimum(TrieNode &node)
-        {
-            if (node.data_)
-                return node;
+    return node;
+  }
 
-            assert(node.child_ != nullptr || node.next_ != nullptr);
-            if (node.child_)
-                return minimum(node.child_);
-            else
-                return minimum(node.next_);
-        }
-        static TrieNode &maximum(TrieNode &node)
-        {
-            node = last(node);
-            while (node.child_)
-                node = last(node.child_);
-            return node;
-        }
-        /**
-         * @brief   Finds successor of TrieNode
-         * 
-         * If TrieNode has child 
-         *  -- the minimum of Trie rooted at child_ is the successor
-         * Otherwise TrieNode has a larger sibling 
-         *  -- the minimum of Trie rooted at next_ is the successor
-         * Otherwise, Node is at end of list with no child
-         *  -- find successor in node's parent, if applicable
-         */
-        static TrieNode &successor(TrieNode &node)
-        {
-            if (node.child_)
-                return minimum(node.child_);
-            if (node.next_)
-                return minimum(node.next_);
+  auto newNode(const value_type &value, node_ptr parent) -> uniq_node_ptr
+  {
+    return std::make_unique<TrieNode>(value.second, parent);
+  }
 
-            TrieNode &curr = node.parent_;
-            while (curr != nullptr)
-            {
-                if (curr.next_)
-                    return minimum(curr.next_);
-                node = curr;
-                curr = curr.parent_;
-            }
-            return nullptr;
-        }
-        TrieNode &operator++()
-        {
-            return successor(this);
-        }
-        TrieNode &operator--()
-        {
-            return predecessor();
-        }
-    };
+public:
+  uniq_node_ptr root_;
+  size_t size_ = 0;
 
-    Trie()
-        : root_(nullptr), size_(0){};
-
-    /**
-     * @brief   Find a TrieNode with key equivalent to key
-     *          If no exact match, 
-     */
-    auto find(const value_type &value) -> iterator;
-    auto find(const value_type &value) const -> const_iterator;
-
-    /**
-     * @brief   Iterator operations
-     */
-    iterator begin();
-    const_iterator begin() const;
-    iterator end();
-    const_iterator end() const;
-
-    /**
-     * @brief   Inserts data to Trie given key 
-     */
-    auto insert(const value_type &value) -> std::pair<iterator, bool>;
-
-  private:
-    TrieNode root_;
-    size_type size_;
+public:
+  friend inline auto operator<<(std::ostream &strm, Trie &t) -> std::ostream &
+  {
+    strm << t.root_->data_ << std::endl;
+    return strm << *t.root_ << std::endl;
+  }
+  friend inline auto operator<<(std::ostream &strm, TrieNode &node) -> std::ostream &
+  {
+    for (auto &child : node.child_)
+    {
+      strm << "|-" << child.first << "\\"
+           << "\t\t" << child.second->data_ << std::endl;
+      if (child.second->child_.size())
+        strm << " " << *child.second.get() << std::endl;
+    }
+    return strm;
+  }
 };
 }
 #endif

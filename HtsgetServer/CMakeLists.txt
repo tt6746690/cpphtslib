@@ -7,7 +7,8 @@ project(HtsgetServer)
 # header only libraries libraries 
 set(HEADER_ONLY_INCLUDE 
     ../lib/asio-1.10.6/include
-    ../lib/Catch/single_include)
+    ../lib/Catch/single_include
+    ../lib/sparsepp)
 
 # # include directory
 include_directories(include)
@@ -46,6 +47,7 @@ set(TEST_FILES
     test/test_RequestParser.cpp
     test/test_Message.cpp
     test/test_Response.cpp
+    test/test_Trie.cpp
 )
 
 add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})

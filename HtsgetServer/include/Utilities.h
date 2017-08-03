@@ -6,11 +6,24 @@
 #include <string>
 #include <type_traits>
 #include <typeinfo>
+#include <cstddef>
 
 #include "Constants.h" // uri_charsets
 
 namespace Http
 {
+
+auto constexpr constexpr_strlen(const char *s) -> size_t
+{
+    size_t length = 0;
+    if (s)
+    {
+        while (*s++)
+            ++length;
+    }
+    return length;
+}
+
 template <typename T1, typename T2>
 auto operator<<(std::ostream &strm, const std::pair<T1, T2> &p) -> std::ostream &
 {

@@ -9,7 +9,8 @@
         "/Library/Developer/CommandLineTools/usr/include",
         "/usr/include",
         "/System/Library/Frameworks",
-        "/Library/Frameworks"
+        "/Library/Frameworks",
+        "./lib"
       ],
       "defines": [],
       "browse": {
@@ -21,7 +22,8 @@
           "/Library/Developer/CommandLineTools/usr/include",
           "/usr/include",
           "/System/Library/Frameworks",
-          "/Library/Frameworks"
+          "/Library/Frameworks",
+          "./lib"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""
