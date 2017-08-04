@@ -9,14 +9,29 @@ using namespace Http;
 TEST_CASE("TrieNode", "[Trie]")
 {
     Trie<std::string>::TrieNode n{};
-    using node_ptr = Trie<std::string>::TrieNode;
 
     REQUIRE(n.data_ == "");
     REQUIRE(n.parent_ == nullptr);
     REQUIRE(n.child_.size() == 0);
 }
 
-TEST_CASE("Trie", "[Trie]")
+TEST_CASE("Trie Full example", "[Trie]")
+{
+    Trie<std::string> t{};
+
+    SECTION("insert a lot")
+    {
+        t.insert({"smile", "smile"});
+        t.insert({"smiled", "smiled"});
+        t.insert({"zzz", "zzz"});
+        t.insert({"smiles", "smiles"});
+        t.insert({"smiling", "smiling"});
+
+        std::cout << t << std::endl;
+    }
+}
+
+TEST_CASE("Trie::{find, insert}", "[Trie]")
 {
     Trie<std::string> t{};
     using node_ptr = Trie<std::string>::TrieNode *;
@@ -26,7 +41,7 @@ TEST_CASE("Trie", "[Trie]")
     REQUIRE(t.root_->parent_ == nullptr);
     REQUIRE(t.root_->child_.size() == 0);
 
-    SECTION("2 different string")
+    SECTION("different strings")
     {
         t.insert(std::make_pair("a", "value1"));
         t.insert(std::make_pair("b", "value2"));
@@ -36,24 +51,29 @@ TEST_CASE("Trie", "[Trie]")
         REQUIRE(t.root_->child_.size() == 2);
     }
 
-    SECTION("substring")
+    SECTION("previous key is substring")
     {
         /*
-            pre         [shortstr]
-            presuffix   [longstr]
-        */
-        auto pre = std::make_pair("pre", "shortstr");
-        t.insert(pre);
-        REQUIRE(t.root_->child_["pre"]->data_ == pre.second);
-        REQUIRE(t.root_->child_.size() == 1);
+            pre         
+            presuffix   
 
-        auto presuffix = std::make_pair("presuffix", "longstr");
+            should append new key 
+
+            pre\
+                |- suffix
+        */
+        auto prev_key = std::make_pair("pre", "shortstr");
+        auto new_key = std::make_pair("presuffix", "longstr");
+
+        t.insert(prev_key);
+        REQUIRE(t.root_->child_["pre"]->data_ == prev_key.second);
+        REQUIRE(t.root_->child_.size() == 1);
 
         SECTION("find")
         {
             node_ptr found;
             std::string suffix;
-            std::tie(found, suffix) = t.find(presuffix);
+            std::tie(found, suffix) = t.find(new_key);
 
             auto node = t.root_->child_["pre"].get();
             REQUIRE(node == found);
@@ -62,7 +82,7 @@ TEST_CASE("Trie", "[Trie]")
 
         SECTION("insert")
         {
-            t.insert(presuffix);
+            t.insert(new_key);
 
             auto node = t.root_->child_["pre"].get();
             REQUIRE(t.root_->child_.size() == 1);
@@ -72,7 +92,49 @@ TEST_CASE("Trie", "[Trie]")
         }
     }
 
-    SECTION("strings sharing common prefix")
+    SECTION("new key is substring")
+    {
+        /*
+            presuffix         
+            pre
+
+            pre\
+                |- suffix
+        */
+        auto prev_key = std::make_pair("presuffix", "prev_key");
+        auto new_key = std::make_pair("pre", "new_key");
+
+        t.insert(prev_key);
+
+        REQUIRE(t.root_->child_["presuffix"]->data_ == prev_key.second);
+        REQUIRE(t.root_->child_.size() == 1);
+
+        SECTION("find")
+        {
+            node_ptr found;
+            std::string suffix;
+            std::tie(found, suffix) = t.find(new_key);
+
+            auto node = t.root_.get();
+            REQUIRE(node == found);
+            REQUIRE(suffix == "pre");
+        }
+
+        SECTION("insert")
+        {
+            t.insert(new_key);
+            REQUIRE_THROWS_AS(t.root_->child_.at("presuffix"), std::out_of_range);
+            REQUIRE_NOTHROW(t.root_->child_.at("pre"));
+
+            auto branch = t.root_->child_.at("pre").get();
+            REQUIRE(branch->data_ == new_key.second);
+            REQUIRE(branch->child_.size() == 1);
+            REQUIRE_NOTHROW(branch->child_.at("suffix"));
+            REQUIRE(branch->child_.at("suffix").get()->data_ == prev_key.second);
+        }
+    }
+
+    SECTION("keys share common prefix")
     {
         /*
             should split 
@@ -105,8 +167,6 @@ TEST_CASE("Trie", "[Trie]")
         {
             t.insert(str2);
 
-            std::cout << t << std::endl;
-
             REQUIRE_THROWS_AS(t.root_->child_.at("pre1"), std::out_of_range);
             REQUIRE_THROWS_AS(t.root_->child_.at("pre2"), std::out_of_range);
             REQUIRE_NOTHROW(t.root_->child_.at("pre"));
@@ -116,8 +176,8 @@ TEST_CASE("Trie", "[Trie]")
             REQUIRE(branch->child_.size() == 2);
             REQUIRE_NOTHROW(branch->child_.at("1"));
             REQUIRE_NOTHROW(branch->child_.at("2"));
-            REQUIRE_NOTHROW(branch->child_.at("1").get()->data_ == "str1");
-            REQUIRE_NOTHROW(branch->child_.at("2").get()->data_ == "str2");
+            REQUIRE(branch->child_.at("1").get()->data_ == "str1");
+            REQUIRE(branch->child_.at("2").get()->data_ == "str2");
         }
     }
 }

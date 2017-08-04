@@ -12,6 +12,7 @@
 #include <memory>
 #include <ostream>
 #include <algorithm>
+#include <initializer_list>
 
 #include <sparsepp/spp.h>
 
@@ -143,18 +144,20 @@ public:
         assert(*prev_mismatch != *input_mismatch);
 
         std::string common_prefix{prev_key.begin(), prev_mismatch};
-
-        node_ptr prev_node = child.second.release();
-        auto nerased = node->child_.erase(prev_key);
-
         std::string prev_suffix{prev_mismatch, prev_key.end()};
         std::string input_suffix{input_mismatch, input_key.end()};
 
-        if (input_mismatch == input_key.end()) /* branching node holds new data */
-        {
-          assert(input_key == common_prefix);
-          assert(prev_key != common_prefix);
+        node_ptr prev_node = child.second.release();
+        node->child_.erase(prev_key);
 
+        assert(prev_key != common_prefix);
+
+        /**
+         *  {common_prefix == input_suffix}\
+         *                                |- prev_suffix
+         */
+        if (input_mismatch == input_key.end())
+        {
           node->child_.emplace(
               std::make_pair(common_prefix, newNode(node, value)));
           auto branch_node = node->child_.at(common_prefix).get();
@@ -163,11 +166,13 @@ public:
               std::make_pair(prev_suffix, std::unique_ptr<TrieNode>(prev_node)));
           return node;
         }
-        else /* branching node points to previous and new node */
+        /**
+         *  common_prefix\
+         *                |- input_suffix
+         *                |- prev_suffix
+         */
+        else
         {
-          assert(input_key != common_prefix);
-          assert(prev_key != common_prefix);
-
           node->child_.emplace(
               std::make_pair(common_prefix, newNode(node)));
           auto branch_node = node->child_.at(common_prefix).get();
@@ -181,6 +186,10 @@ public:
       }
     }
 
+    /**
+     *  {common_prefix == prev_suffix}\
+     *                                |- input_suffix
+     */
     node->child_.emplace(
         std::make_pair(input_key, newNode(node, value)));
 
