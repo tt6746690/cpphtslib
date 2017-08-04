@@ -18,6 +18,7 @@ TEST_CASE("TrieNode", "[Trie]")
 TEST_CASE("Trie Full example", "[Trie]")
 {
     Trie<std::string> t{};
+    using node_ptr = Trie<std::string>::TrieNode *;
 
     SECTION("insert a lot")
     {
@@ -27,17 +28,25 @@ TEST_CASE("Trie Full example", "[Trie]")
         t.insert({"smiles", "smiles"});
         t.insert({"smiling", "smiling"});
 
+        node_ptr found;
+        std::string suffix;
+        std::tie(found, suffix) = t.find_to_insert("smile");
+
+        // auto node = t.root_->child_["smil"].get();
+        // REQUIRE(node == found);
+        // REQUIRE(suffix == "suffix");
+
         std::cout << t << std::endl;
     }
 }
 
-TEST_CASE("Trie::{find, insert}", "[Trie]")
+TEST_CASE("Trie::{find_to_insert, insert}", "[Trie]")
 {
     Trie<std::string> t{};
     using node_ptr = Trie<std::string>::TrieNode *;
 
     REQUIRE(t.size_ == 0);
-    REQUIRE(t.root_->data_ == "/");
+    REQUIRE(t.root_->data_ == "");
     REQUIRE(t.root_->parent_ == nullptr);
     REQUIRE(t.root_->child_.size() == 0);
 
@@ -46,8 +55,8 @@ TEST_CASE("Trie::{find, insert}", "[Trie]")
         t.insert(std::make_pair("a", "value1"));
         t.insert(std::make_pair("b", "value2"));
 
-        REQUIRE(t.root_->child_["a"]->data_ == "value1");
-        REQUIRE(t.root_->child_["b"]->data_ == "value2");
+        REQUIRE(get_child(t.root_, "a")->data_ == "value1");
+        REQUIRE(get_child(t.root_, "b")->data_ == "value2");
         REQUIRE(t.root_->child_.size() == 2);
     }
 
@@ -69,14 +78,13 @@ TEST_CASE("Trie::{find, insert}", "[Trie]")
         REQUIRE(t.root_->child_["pre"]->data_ == prev_key.second);
         REQUIRE(t.root_->child_.size() == 1);
 
-        SECTION("find")
+        SECTION("find_to_insert")
         {
             node_ptr found;
             std::string suffix;
-            std::tie(found, suffix) = t.find(new_key);
+            std::tie(found, suffix) = t.find_to_insert(new_key.first);
 
-            auto node = t.root_->child_["pre"].get();
-            REQUIRE(node == found);
+            REQUIRE(get_child(t.root_, "pre") == found);
             REQUIRE(suffix == "suffix");
         }
 
@@ -109,11 +117,11 @@ TEST_CASE("Trie::{find, insert}", "[Trie]")
         REQUIRE(t.root_->child_["presuffix"]->data_ == prev_key.second);
         REQUIRE(t.root_->child_.size() == 1);
 
-        SECTION("find")
+        SECTION("find_to_insert")
         {
             node_ptr found;
             std::string suffix;
-            std::tie(found, suffix) = t.find(new_key);
+            std::tie(found, suffix) = t.find_to_insert(new_key.first);
 
             auto node = t.root_.get();
             REQUIRE(node == found);
@@ -152,11 +160,11 @@ TEST_CASE("Trie::{find, insert}", "[Trie]")
         REQUIRE(t.root_->child_["pre1"]->data_ == str1.second);
         REQUIRE(t.root_->child_.size() == 1);
 
-        SECTION("find")
+        SECTION("find_to_insert")
         {
             node_ptr found;
             std::string suffix;
-            std::tie(found, suffix) = t.find(str2);
+            std::tie(found, suffix) = t.find_to_insert(str2.first);
 
             auto node = t.root_.get();
             REQUIRE(node == found);

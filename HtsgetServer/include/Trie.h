@@ -66,41 +66,18 @@ public:
   };
 
   Trie()
-      : root_(std::make_unique<TrieNode>(nullptr, "/")), size_(0){};
+      : root_(std::make_unique<TrieNode>(nullptr)), size_(0){};
 
   /**
-   * @brief   Find a TrieNode in Trie rooted at node 
-   *          with key equivalent to key, If no exact match, 
-   *          Return the last node with a common prefix
+   * @brief   Given a key, find a node with identical prefix
+   *          Return pointer to such node if exists, otherwise to root_
    */
-  auto static find_in(std::string &key, node_ptr node) -> node_ptr
+  auto find(const std::string &key) -> node_ptr
   {
-    if (!key.size())
-      return node;
-
-    for (int i = 1; i < key.size(); i++)
+    node_ptr curr = root_.get();
+    while (is_internal(curr))
     {
-      auto found = node->child_.find(key.substr(0, i));
-      if (found != node->child_.end())
-      {
-        key = key.substr(i);
-        return find_in(key, (found->second).get());
-      }
     }
-    return node;
-  }
-
-  /** 
-   * @brief   Given a value = (Key,T), find the node to insert to
-   * 
-   * invariant 
-   *  suffix.substr(0, i) is not contained in node's map
-   *  i.e. suffix must be inserted in node's map in some way
-   */
-  auto find(const value_type &value) -> std::pair<node_ptr, std::string>
-  {
-    std::string key{value.first};
-    return std::make_pair(find_in(key, root_.get()), key);
   }
 
   /**
@@ -108,16 +85,9 @@ public:
    */
   auto insert(const value_type &value) -> node_ptr
   {
-    if (!root_->child_.size())
-    {
-      root_->child_.emplace(
-          std::make_pair(value.first, newNode(root_.get(), value)));
-      return root_.get();
-    }
-
     node_ptr node;
     std::string input_key;
-    std::tie(node, input_key) = find(value);
+    std::tie(node, input_key) = find_to_insert(value.first);
 
     /**
      * @note  keys in map has unique char at index 0
@@ -134,14 +104,13 @@ public:
      */
     for (auto &child : node->child_)
     {
-      if (child.first.front() == input_key.front())
+      auto prev_key = child.first;
+      if (prev_key.front() == input_key.front())
       {
-        auto prev_key = child.first;
         std::string::iterator prev_mismatch, input_mismatch;
 
         std::tie(prev_mismatch, input_mismatch) =
             mismatch(prev_key.begin(), prev_key.end(), input_key.begin());
-        assert(*prev_mismatch != *input_mismatch);
 
         std::string common_prefix{prev_key.begin(), prev_mismatch};
         std::string prev_suffix{prev_mismatch, prev_key.end()};
@@ -185,7 +154,6 @@ public:
         }
       }
     }
-
     /**
      *  {common_prefix == prev_suffix}\
      *                                |- input_suffix
@@ -196,12 +164,27 @@ public:
     return node;
   }
 
+  /** 
+   * @brief   Given a key, find the node to insert to
+   * 
+   * invariant 
+   *  suffix.substr(0, i) is not contained in node's map
+   *  i.e. suffix must be inserted in node's map in some way
+   */
+  auto find_to_insert(const std::string &key) -> std::pair<node_ptr, std::string>
+  {
+    std::string dup_key{key};
+    return std::make_pair(find_in(dup_key, root_.get()), dup_key);
+  }
+
   auto newNode(node_ptr parent, const value_type &value) -> uniq_node_ptr
   {
+    size_ += 1;
     return std::make_unique<TrieNode>(parent, value.second);
   }
   auto newNode(node_ptr parent) -> uniq_node_ptr
   {
+    size_ += 1;
     return std::make_unique<TrieNode>(parent);
   }
 
@@ -209,16 +192,75 @@ public:
   uniq_node_ptr root_;
   size_t size_ = 0;
 
+private:
+  /**
+   * @brief   Determine if a node is a leaf / internal node
+   * A node is a leaf if does not have children, otherwise is an internal node
+   */
+  auto static is_leaf(node_ptr node) -> bool
+  {
+    return node->child_.size() == 0;
+  }
+  auto static is_internal(node_ptr node) -> bool
+  {
+    return node->child_.size() != 0;
+  }
+
+  /**
+   * @brief   Find a TrieNode in Trie rooted at node 
+   *          with key equivalent to key, If no exact match, 
+   *          Return the last node with a common prefix
+   */
+  auto static find_in(std::string &key, node_ptr node) -> node_ptr
+  {
+    if (!key.size())
+      return node;
+
+    if (is_leaf(node))
+      return node;
+
+    for (int i = 1; i < key.size(); i++)
+    {
+      auto found = node->child_.find(key.substr(0, i));
+      if (found != node->child_.end())
+      {
+        key = key.substr(i);
+        return find_in(key, (found->second).get());
+      }
+    }
+    return node;
+  }
+
 public:
+  /**
+   * @brief   Finds the child of given node with corresponding prefix
+   */
+  friend inline auto get_child(const node_ptr &node, std::string prefix) -> node_ptr
+  {
+    return node->child_.at(prefix).get();
+  }
+  friend inline auto get_child(const uniq_node_ptr &node, std::string prefix) -> node_ptr
+  {
+    return node.get()->child_.at(prefix).get();
+  }
+
   friend inline auto operator<<(std::ostream &strm, Trie &t) -> std::ostream &
   {
+    strm << "size: " << t.size_ << std::endl;
     return strm << *t.root_ << std::endl;
   }
   friend inline auto operator<<(std::ostream &strm, TrieNode &node) -> std::ostream &
   {
-    strm << "|-" << node.data_ << std::endl;
+    static std::string::size_type depth = 0;
+    strm << "\t\t" << node.data_ << std::endl;
     if (node.child_.size())
-      strm << node.child_ << std::endl;
+    {
+      depth += 1;
+      for (auto &item : node.child_)
+        strm << std::string{"  ", depth} << "|-" << item.first << "\\"
+             << *item.second.get();
+      depth -= 1;
+    }
     return strm;
   }
 
