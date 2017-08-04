@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <cstddef>
+#include <unordered_map>
 
 #include "Constants.h" // uri_charsets
 
