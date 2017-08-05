@@ -29,16 +29,17 @@ class Trie
 {
 public:
   struct TrieNode;
+  class TrieIterator;
 
   using key_type = std::string;
   using mapped_type = T;
   using value_type = std::pair<const key_type, T>;
   using reference = value_type &;
   using const_reference = const value_type &;
-  using iterator = TrieNode *;
-  using const_iterator = const TrieNode *;
+  using iterator = TrieIterator;
 
   using node_ptr = TrieNode *;
+  using trie_ptr = Trie *;
   using uniq_node_ptr = std::unique_ptr<TrieNode>;
 
 public:
@@ -53,9 +54,6 @@ public:
  */
   struct TrieNode
   {
-    using node_ptr = TrieNode *;
-    using uniq_node_ptr = std::unique_ptr<TrieNode>;
-
     T data_;
     node_ptr parent_ = nullptr;
     std::unordered_map<std::string, uniq_node_ptr> child_;
@@ -65,13 +63,59 @@ public:
         : data_(data), parent_(parent){};
   };
 
+  class TrieIterator
+  {
+
+  public:
+    Trie *trie_;
+    node_ptr node_;
+
+  public:
+    explicit TrieIterator(){};
+    explicit TrieIterator(trie_ptr trie, node_ptr node = nullptr)
+        : trie_(trie), node_(node){};
+
+    bool operator==(const TrieIterator &rhs) const
+    {
+      return (node_->parent_ == rhs.node_->parent_) &&
+             (node_->data_ == rhs.node_->data_) &&
+             (node_->child_ == rhs.node_->child_);
+    }
+    bool operator!=(const TrieIterator &rhs) const
+    {
+      return !(this == rhs);
+    }
+
+    mapped_type &operator*() const
+    {
+      return node_->data_;
+    }
+  };
+
   Trie()
       : root_(std::make_unique<TrieNode>(nullptr)), size_(0){};
 
   /**
+   * @brief   Iterator related functions
+   */
+  auto begin() -> iterator
+  {
+    node_ptr curr = root_.get();
+    while (!curr->data_)
+    {
+      curr = curr->child_.begin().second.get();
+    }
+    return iterator(this, curr);
+  }
+  auto end() -> iterator
+  {
+    return iterator(this, root_.get());
+  }
+
+  /**
    * @brief   Inserts data to Trie given key 
    */
-  auto insert(const value_type &value) -> node_ptr
+  auto insert(const value_type &value) -> iterator
   {
     node_ptr node;
     std::string input_key;
@@ -119,7 +163,7 @@ public:
 
           branch_node->child_.emplace(
               std::make_pair(prev_suffix, std::unique_ptr<TrieNode>(prev_node)));
-          return node;
+          return iterator(this, node);
         }
         /**
          *  common_prefix\
@@ -137,7 +181,7 @@ public:
 
           branch_node->child_.emplace(
               std::make_pair(input_suffix, newNode(node, value)));
-          return branch_node;
+          return iterator(this, branch_node);
         }
       }
     }
@@ -148,21 +192,18 @@ public:
     node->child_.emplace(
         std::make_pair(input_key, newNode(node, value)));
 
-    return node;
+    return iterator(this, node);
   }
 
   /**
    * @brief   Given a key, find a node with identical prefix
    *          Return pointer to such node if exists, otherwise to root_
    */
-  auto find(const std::string &key) -> node_ptr
+  auto find(const std::string &key) -> iterator
   {
     std::string prefix;
     auto suffix_size = key.size();
     auto curr = root_.get();
-
-    std::cout << key << std::endl;
-
     /**
      * Check all prefixes of key in child's map, 
      * if a prefix is found in a child's map, then implies either 
@@ -179,7 +220,7 @@ public:
       {
         if (len == suffix_size)
         {
-          return get_child(curr, prefix);
+          return iterator(this, get_child(curr, prefix));
         }
         else
         {
@@ -190,8 +231,7 @@ public:
         }
       }
     }
-
-    return root_.get();
+    return end();
   }
 
   /** 
@@ -230,24 +270,13 @@ public:
     return std::make_pair(curr, std::string{key.substr(pos, len)});
   }
 
-  auto newNode(node_ptr parent, const value_type &value) -> uniq_node_ptr
-  {
-    size_ += 1;
-    return std::make_unique<TrieNode>(parent, value.second);
-  }
-  auto newNode(node_ptr parent) -> uniq_node_ptr
-  {
-    size_ += 1;
-    return std::make_unique<TrieNode>(parent);
-  }
-
 public:
   uniq_node_ptr root_;
   size_t size_ = 0;
 
 private:
   /**
-   * @brief   Determine if a node is a leaf / internal node
+   * @brief   Test if a node is a leaf / internal node
    * A node is a leaf if does not have children, otherwise is an internal node
    */
   auto static is_leaf(node_ptr node) -> bool
@@ -257,6 +286,34 @@ private:
   auto static is_internal(node_ptr node) -> bool
   {
     return node->child_.size() != 0;
+  }
+
+  /**
+   * @brief   Test if a node is root / non-root
+   * A node is root if its parent_ is nullptr, and nonroot otherwise
+   */
+  auto static is_root(node_ptr node) -> bool
+  {
+    return node->parent_ == nullptr;
+  }
+  auto static is_nonroot(node_ptr node) -> bool
+  {
+    return node->parent_ != nullptr;
+  }
+
+  /**
+   * @brief   Helper function for creating node node
+   */
+
+  auto newNode(node_ptr parent, const value_type &value) -> uniq_node_ptr
+  {
+    size_ += 1;
+    return std::make_unique<TrieNode>(parent, value.second);
+  }
+  auto newNode(node_ptr parent) -> uniq_node_ptr
+  {
+    size_ += 1;
+    return std::make_unique<TrieNode>(parent);
   }
 
   /**

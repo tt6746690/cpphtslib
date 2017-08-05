@@ -18,7 +18,8 @@ TEST_CASE("TrieNode", "[Trie]")
 TEST_CASE("Trie Full example", "[Trie]")
 {
     Trie<std::string> t{};
-    using node_ptr = Trie<std::string>::TrieNode *;
+    // using node_ptr = Trie<std::string>::TrieNode *;
+    using iterator = Trie<std::string>::TrieIterator;
 
     t.insert({"smile", "smile"});
     t.insert({"smiled", "smiled"});
@@ -52,17 +53,22 @@ TEST_CASE("Trie Full example", "[Trie]")
         REQUIRE(smiles->data_ == "smiles");
         REQUIRE(smiling->data_ == "smiling");
 
-        node_ptr found;
+        iterator found;
         found = t.find("smil");
-        REQUIRE(found == smil);
+        REQUIRE(found.node_ == smil);
+        REQUIRE(*found == "");
         found = t.find("smile");
-        REQUIRE(found == smile);
+        REQUIRE(found.node_ == smile);
+        REQUIRE(*found == "smile");
         found = t.find("smiled");
-        REQUIRE(found == smiled);
+        REQUIRE(found.node_ == smiled);
+        REQUIRE(*found == "smiled");
         found = t.find("smiles");
-        REQUIRE(found == smiles);
+        REQUIRE(found.node_ == smiles);
+        REQUIRE(*found == "smiles");
         found = t.find("smiling");
-        REQUIRE(found == smiling);
+        REQUIRE(found.node_ == smiling);
+        REQUIRE(*found == "smiling");
     }
 }
 
