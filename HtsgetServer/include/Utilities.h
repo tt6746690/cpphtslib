@@ -25,6 +25,12 @@ auto constexpr constexpr_strlen(const char *s) -> size_t
     return length;
 }
 
+template <typename T, typename Key>
+auto has_key(const T &container, const Key &key) -> bool
+{
+    return (container.find(key) != std::end(container));
+}
+
 template <typename T1, typename T2>
 auto operator<<(std::ostream &strm, const std::pair<T1, T2> &p) -> std::ostream &
 {

@@ -20,23 +20,49 @@ TEST_CASE("Trie Full example", "[Trie]")
     Trie<std::string> t{};
     using node_ptr = Trie<std::string>::TrieNode *;
 
-    SECTION("insert a lot")
+    t.insert({"smile", "smile"});
+    t.insert({"smiled", "smiled"});
+    t.insert({"smiles", "smiles"});
+
+    /*
+    |-smile\          smile
+        |-s\          smiles
+        |-d\          smiled
+    */
+    t.insert({"smiling", "smiling"});
+    /*
+    |-smil\                         // branch node 
+        |-ing\          smiling     // input node
+        |-e\            smile       // prev node
+            |-s\        smiles
+            |-d\        smiled
+    */
+    SECTION("find")
     {
-        t.insert({"smile", "smile"});
-        t.insert({"smiled", "smiled"});
-        t.insert({"zzz", "zzz"});
-        t.insert({"smiles", "smiles"});
-        t.insert({"smiling", "smiling"});
+
+        auto smil = get_child(t.root_, "smil");
+        auto smiling = get_child(smil, "ing");
+        auto smile = get_child(smil, "e");
+        auto smiled = get_child(smile, "d");
+        auto smiles = get_child(smile, "s");
+
+        REQUIRE(smil->data_ == "");
+        REQUIRE(smile->data_ == "smile");
+        REQUIRE(smiled->data_ == "smiled");
+        REQUIRE(smiles->data_ == "smiles");
+        REQUIRE(smiling->data_ == "smiling");
 
         node_ptr found;
-        std::string suffix;
-        std::tie(found, suffix) = t.find_to_insert("smile");
-
-        // auto node = t.root_->child_["smil"].get();
-        // REQUIRE(node == found);
-        // REQUIRE(suffix == "suffix");
-
-        std::cout << t << std::endl;
+        found = t.find("smil");
+        REQUIRE(found == smil);
+        found = t.find("smile");
+        REQUIRE(found == smile);
+        found = t.find("smiled");
+        REQUIRE(found == smiled);
+        found = t.find("smiles");
+        REQUIRE(found == smiles);
+        found = t.find("smiling");
+        REQUIRE(found == smiling);
     }
 }
 

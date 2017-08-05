@@ -69,18 +69,6 @@ public:
       : root_(std::make_unique<TrieNode>(nullptr)), size_(0){};
 
   /**
-   * @brief   Given a key, find a node with identical prefix
-   *          Return pointer to such node if exists, otherwise to root_
-   */
-  auto find(const std::string &key) -> node_ptr
-  {
-    node_ptr curr = root_.get();
-    while (is_internal(curr))
-    {
-    }
-  }
-
-  /**
    * @brief   Inserts data to Trie given key 
    */
   auto insert(const value_type &value) -> node_ptr
@@ -118,9 +106,7 @@ public:
 
         node_ptr prev_node = child.second.release();
         node->child_.erase(prev_key);
-
         assert(prev_key != common_prefix);
-
         /**
          *  {common_prefix == input_suffix}\
          *                                |- prev_suffix
@@ -144,10 +130,11 @@ public:
         {
           node->child_.emplace(
               std::make_pair(common_prefix, newNode(node)));
-          auto branch_node = node->child_.at(common_prefix).get();
+          auto branch_node = get_child(node, common_prefix);
 
           branch_node->child_.emplace(
               std::make_pair(prev_suffix, std::unique_ptr<TrieNode>(prev_node)));
+
           branch_node->child_.emplace(
               std::make_pair(input_suffix, newNode(node, value)));
           return branch_node;
@@ -164,6 +151,49 @@ public:
     return node;
   }
 
+  /**
+   * @brief   Given a key, find a node with identical prefix
+   *          Return pointer to such node if exists, otherwise to root_
+   */
+  auto find(const std::string &key) -> node_ptr
+  {
+    std::string prefix;
+    auto suffix_size = key.size();
+    auto curr = root_.get();
+
+    std::cout << key << std::endl;
+
+    /**
+     * Check all prefixes of key in child's map, 
+     * if a prefix is found in a child's map, then implies either 
+     * -- found the exact matching node, given the prefix exhaust the key 
+     * -- found the a prefix node, 
+     * ---- advance the current node and 
+     * ---- search the remaining suffix key excluding the common prefix 
+     * if we cant always find such prefix, then implies key not in trie
+     */
+    for (int len = 1, pos = 0; len <= suffix_size; len++)
+    {
+      prefix = key.substr(pos, len);
+      if (curr->child_.count(prefix))
+      {
+        if (len == suffix_size)
+        {
+          return get_child(curr, prefix);
+        }
+        else
+        {
+          pos += len;
+          suffix_size -= len;
+          len = 0;
+          curr = get_child(curr, prefix);
+        }
+      }
+    }
+
+    return root_.get();
+  }
+
   /** 
    * @brief   Given a key, find the node to insert to
    * 
@@ -173,8 +203,31 @@ public:
    */
   auto find_to_insert(const std::string &key) -> std::pair<node_ptr, std::string>
   {
-    std::string dup_key{key};
-    return std::make_pair(find_in(dup_key, root_.get()), dup_key);
+    std::string prefix;
+    auto suffix_size = key.size();
+    auto curr = root_.get();
+
+    int len, pos;
+
+    for (len = 1, pos = 0; len <= suffix_size; len++)
+    {
+      prefix = key.substr(pos, len);
+      if (curr->child_.count(prefix))
+      {
+        if (len == suffix_size)
+        {
+          return std::make_pair(get_child(curr, prefix), std::string{});
+        }
+        else
+        {
+          pos += len;
+          suffix_size -= len;
+          len = 0;
+          curr = get_child(curr, prefix);
+        }
+      }
+    }
+    return std::make_pair(curr, std::string{key.substr(pos, len)});
   }
 
   auto newNode(node_ptr parent, const value_type &value) -> uniq_node_ptr
@@ -211,7 +264,7 @@ private:
    *          with key equivalent to key, If no exact match, 
    *          Return the last node with a common prefix
    */
-  auto static find_in(std::string &key, node_ptr node) -> node_ptr
+  auto static find_in(node_ptr node, std::string &key) -> node_ptr
   {
     if (!key.size())
       return node;
@@ -225,7 +278,7 @@ private:
       if (found != node->child_.end())
       {
         key = key.substr(i);
-        return find_in(key, (found->second).get());
+        return find_in((found->second).get(), key);
       }
     }
     return node;
