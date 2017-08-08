@@ -9,10 +9,18 @@
 #include <cstddef>
 #include <unordered_map>
 
-#include "Constants.h" // uri_charsets
-
 namespace Http
 {
+
+auto constexpr constexpr_streq(const char *x, const char *y) -> bool
+{
+    while (*x || *y)
+    {
+        if (*x++ != *y++)
+            return false;
+    }
+    return false;
+}
 
 auto constexpr constexpr_strlen(const char *s) -> size_t
 {
@@ -169,6 +177,18 @@ constexpr bool is_token(char c)
 {
     return !is_ctl(c) && !is_separator(c) && is_char(c);
 }
+
+/** 
+ * static strings 
+ */
+
+static constexpr char unreserved_charset[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~";
+static constexpr char reserved_charset[] = "!*'();:@&=+$,/?#[]";
+static constexpr char uri_charset[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
+    "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
+    "?#[]";
 
 constexpr bool is_uri(char c)
 {

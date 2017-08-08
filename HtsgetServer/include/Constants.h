@@ -1,20 +1,10 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "Utilities.h"
+
 namespace Http
 {
-
-/** 
- * static strings 
- */
-
-static constexpr char unreserved_charset[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~";
-static constexpr char reserved_charset[] = "!*'();:@&=+$,/?#[]";
-static constexpr char uri_charset[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
-    "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
-    "?#[]";
 
 /**
  * Uri
@@ -61,6 +51,20 @@ enum class RequestMethod
     UNDETERMINED
 };
 
+constexpr int method_count =
+    etoint(RequestMethod::UNDETERMINED) - etoint(RequestMethod::GET);
+
+constexpr static char *request_methods[] = {
+    (char *)"GET",
+    (char *)"HEAD",
+    (char *)"POST",
+    (char *)"PUT",
+    (char *)"PATCH",
+    (char *)"DELETE",
+    (char *)"CONNECT",
+    (char *)"OPTIONS",
+    (char *)"TRACE"};
+
 enum class RequestHeaderName
 {
     Accept = 0,
@@ -98,17 +102,6 @@ enum class RequestHeaderName
     Via,
     Warning
 };
-
-constexpr static char *request_methods[] = {
-    (char *)"GET",
-    (char *)"HEAD",
-    (char *)"POST",
-    (char *)"PUT",
-    (char *)"PATCH",
-    (char *)"DELETE",
-    (char *)"CONNECT",
-    (char *)"OPTIONS",
-    (char *)"TRACE"};
 
 /**
  * Response

@@ -28,6 +28,7 @@ public:
   using reference = value_type &;
   using const_reference = const value_type &;
   using iterator = TrieIterator;
+  using const_iterator = const TrieIterator;
 
   using node_ptr = TrieNode *;
   using trie_ptr = Trie *;
@@ -53,6 +54,7 @@ public:
     explicit TrieNode(node_ptr parent, T data = T())
         : data_(data), parent_(parent){};
   };
+
   /**
    * @brief   Iterator of a Trie
    * 
@@ -85,6 +87,33 @@ public:
     mapped_type &operator*() const
     {
       return node_->data_;
+    }
+
+    iterator &operator--() // predecrement
+    {
+      if (node_->parent_)
+        node_ = node_->parent_;
+      return *this;
+    }
+
+    iterator operator--(int) // postdecrement
+    {
+      iterator result = *this;
+      --(*this);
+      return result;
+    }
+    iterator &operator++() // predecrement
+    {
+      if (node_->child_)
+        node_ = node_->child_.begin();
+      return *this;
+    }
+
+    iterator operator++(int) // postdecrement
+    {
+      iterator result = *this;
+      ++(*this);
+      return result;
     }
   };
 

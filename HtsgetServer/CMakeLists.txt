@@ -25,7 +25,6 @@ set(SOURCE_FILES
     src/Utilities.cpp
     src/Uri.cpp
     src/Router.cpp
-    src/Trie.cpp
     include/Server.h
     include/Connection.h 
     include/Message.h 
