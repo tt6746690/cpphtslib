@@ -38,14 +38,20 @@ TEST_CASE("Trie Full example", "[Trie]")
             |-s\        smiles
             |-d\        smiled
     */
+    std::cout << t << std::endl;
+
     SECTION("find")
     {
-
         auto smil = get_child(t.root_, "smil");
         auto smiling = get_child(smil, "ing");
         auto smile = get_child(smil, "e");
         auto smiled = get_child(smile, "d");
         auto smiles = get_child(smile, "s");
+
+        REQUIRE_NOTHROW(get_child(smile, "d"));
+        REQUIRE_NOTHROW(get_child(smile, "s"));
+        REQUIRE_THROWS_AS(get_child(smil, "d"), std::out_of_range);
+        REQUIRE_THROWS_AS(get_child(smil, "s"), std::out_of_range);
 
         REQUIRE(smil->data_ == "");
         REQUIRE(smile->data_ == "smile");

@@ -3,26 +3,17 @@
 
 #include <string>
 #include <utility>
-#include <bitset>
-#include <vector>
 #include <cstddef>
-#include <iterator>
 #include <unordered_map>
-#include <array>
 #include <memory>
 #include <ostream>
 #include <algorithm>
-#include <initializer_list>
-
-#include <sparsepp/spp.h>
+#include <cassert>
 
 #include <Utilities.h>
 
 namespace Http
 {
-
-constexpr size_t uri_charset_size = constexpr_strlen(uri_charset);
-constexpr size_t radix = 16;
 
 template <typename T>
 class Trie
@@ -44,14 +35,14 @@ public:
 
 public:
   /**
- * @brief   Node of a Trie
- * 
- * @param   data_       auxiliary data 
- *                      internal node:  may or may not contain data_
- *                      leaf node: must has valid data_
- * @param   parent_     pointer to parent node, nullptr for root_
- * @param   child_      a mapping of prefixes and pointers to associated nodes 
- */
+   * @brief   Node of a Trie
+   * 
+   * @param   data_       auxiliary data 
+   *                      internal node:  may or may not contain data_
+   *                      leaf node: must has valid data_
+   * @param   parent_     pointer to parent node, nullptr for root_
+   * @param   child_      a mapping of prefixes and pointers to associated nodes 
+   */
   struct TrieNode
   {
     T data_;
@@ -62,7 +53,12 @@ public:
     explicit TrieNode(node_ptr parent, T data = T())
         : data_(data), parent_(parent){};
   };
-
+  /**
+   * @brief   Iterator of a Trie
+   * 
+   * @param   trie_       points to the trie iterator belongs to
+   * @param   node_       the current TrieNode iterator points to
+   */
   class TrieIterator
   {
 
@@ -163,7 +159,7 @@ public:
 
           branch_node->child_.emplace(
               std::make_pair(prev_suffix, std::unique_ptr<TrieNode>(prev_node)));
-          return iterator(this, node);
+          return iterator(this, branch_node);
         }
         /**
          *  common_prefix\
@@ -181,7 +177,9 @@ public:
 
           branch_node->child_.emplace(
               std::make_pair(input_suffix, newNode(node, value)));
-          return iterator(this, branch_node);
+
+          auto inserted_node = get_child(branch_node, input_suffix);
+          return iterator(this, inserted_node);
         }
       }
     }
@@ -191,8 +189,8 @@ public:
      */
     node->child_.emplace(
         std::make_pair(input_key, newNode(node, value)));
-
-    return iterator(this, node);
+    auto inserted_node = get_child(node, input_key);
+    return iterator(this, inserted_node);
   }
 
   /**
@@ -356,20 +354,21 @@ public:
 
   friend inline auto operator<<(std::ostream &strm, Trie &t) -> std::ostream &
   {
+    strm << "\\" << *t.root_ << std::endl;
     strm << "size: " << t.size_ << std::endl;
-    return strm << *t.root_ << std::endl;
+    return strm;
   }
   friend inline auto operator<<(std::ostream &strm, TrieNode &node) -> std::ostream &
   {
-    static std::string::size_type depth = 0;
-    strm << "\t\t" << node.data_ << std::endl;
+    static size_t depth = 0;
+    strm << "\t" << node.data_ << std::endl;
     if (node.child_.size())
     {
-      depth += 1;
+      depth += 2;
       for (auto &item : node.child_)
-        strm << std::string{"  ", depth} << "|-" << item.first << "\\"
+        strm << std::string(depth, ' ') << depth / 2 << "|-" << item.first << "\\"
              << *item.second.get();
-      depth -= 1;
+      depth -= 2;
     }
     return strm;
   }
