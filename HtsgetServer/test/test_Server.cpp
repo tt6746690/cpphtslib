@@ -1,25 +1,23 @@
-#include <iostream>
+#include "catch.hpp"
 #include <utility>
-#include <memory>
+#include <stdexcept>
 
-#define BOOST_ASIO_ENABLE_HANDLER_TRACKING // debugging
-// #define NDEBUG
-
+#include "Constants.h"
 #include "Server.h"
 
 using namespace std;
 using namespace asio;
 using namespace Http;
 
-int main()
+TEST_CASE("Construct routes", "[Server]")
 {
 
-    try
-    {
-        io_service io;
-        GenericServer::ServerAddr server_address = make_pair("127.0.0.1", 8888);
-        auto app = make_unique<GenericServer>(server_address);
+    io_service io;
+    GenericServer::ServerAddr server_address = make_pair("127.0.0.1", 8888);
+    auto app = make_unique<GenericServer>(server_address);
 
+    SECTION("route 1")
+    {
         app->router_.get("/",
                          Handler([](Context &ctx) {
                              cout << "GET /" << endl;
@@ -32,12 +30,12 @@ int main()
 
         app->router_.get("/home/level2",
                          Handler([](Context &ctx) {
-                             cout << "GET /home/level2" << endl;
+                             cout << "GET /home" << endl;
                          }));
 
         app->router_.get("/account/bar",
                          Handler([](Context &ctx) {
-                             cout << "GET /account/bar" << endl;
+                             cout << "GET /acocunt/bar" << endl;
                          }));
 
         app->router_.get("/account/bar",
@@ -56,12 +54,7 @@ int main()
                           }));
 
         std::cout << app->router_ << std::endl;
-        app->run();
-    }
-    catch (std::exception e)
-    {
-        cerr << e.what() << endl;
-    }
 
-    return 0;
+        server->run();
+    }
 }

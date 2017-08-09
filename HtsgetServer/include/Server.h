@@ -7,6 +7,8 @@
 #include "asio.hpp"
 #endif
 
+#include "Router.h"
+
 namespace Http
 {
 
@@ -34,6 +36,9 @@ public:
 
   std::string host() const;
   int port() const;
+
+public:
+  Router<Handler> router_;
 
 private:
   const ServerAddr &server_address_;

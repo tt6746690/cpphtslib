@@ -36,7 +36,7 @@ void GenericServer::accept_connection()
         [=](std::error_code ec) {
             if (!ec)
             {
-                auto new_connection = std::make_shared<Connection>(std::move(socket_));
+                auto new_connection = std::make_shared<Connection>(std::move(socket_), router_);
                 new_connection->start();
             }
             accept_connection();

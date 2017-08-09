@@ -85,6 +85,22 @@ class Router
     }
 
     /**
+     * @brief   Handle wrapper functions 
+     */
+    auto get(std::string path, T handler) -> void
+    {
+        handle(RequestMethod::GET, path, handler);
+    }
+    auto post(std::string path, T handler) -> void
+    {
+        handle(RequestMethod::POST, path, handler);
+    }
+    auto put(std::string path, T handler) -> void
+    {
+        handle(RequestMethod::PUT, path, handler);
+    }
+
+    /**
      * @brief   Resolve path to a sequence of handler calls
      * 
      *          If no matching path is found, the sequence is empty

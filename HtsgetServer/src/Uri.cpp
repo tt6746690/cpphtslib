@@ -35,6 +35,7 @@ auto Uri::consume(char c) -> ParseStatus
         if (c == '/')
         {
             state_ = UriState::uri_abs_path;
+            abs_path_.push_back(c);
             return ParseStatus::in_progress;
         }
         if (is_alpha(c))

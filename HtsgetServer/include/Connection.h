@@ -4,6 +4,7 @@
 #include "Request.h"
 #include "Response.h"
 #include "RequestParser.h"
+#include "Router.h"
 
 namespace Http
 {
@@ -12,8 +13,8 @@ class Connection
     : public std::enable_shared_from_this<Connection>
 {
 public:
-  explicit Connection(asio::ip::tcp::socket socket)
-      : socket_(std::move(socket)){};
+  explicit Connection(asio::ip::tcp::socket socket, Router<Handler> &router)
+      : socket_(std::move(socket)), router_(router){};
 
   void start();
   void terminate();
@@ -26,7 +27,9 @@ private:
 
   Request request_;
   Response response_;
+  Context context_{request_, response_};
   RequestParser request_parser_;
+  Router<Handler> &router_;
 };
 }
 

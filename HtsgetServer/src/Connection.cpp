@@ -44,7 +44,7 @@ void Connection::read_payload()
           std::tie(begin, parse_status) = request_parser_.parse(
               request_, buffer_.begin(), buffer_.begin() + bytes_read);
 
-          std::cout << request_ << std::endl;
+          // std::cout << request_ << std::endl;
 
           /**
            * Current buffer is fully read, branch on ParseStatus
@@ -58,19 +58,32 @@ void Connection::read_payload()
           switch (parse_status)
           {
           case ParseStatus::in_progress:
+          {
             read_payload();
-            return;
+            break;
+          }
           case ParseStatus::accept:
-            // handler start the roure.. for now just return statusline
+          {
+            auto handlers = router_.resolve(request_.method_, request_.uri_.abs_path_);
+
+            for (auto &handler : handlers)
+            {
+              handler(context_);
+            }
+
             response_.status_code(StatusCode::OK);
             write_payload();
-            return;
+            break;
+          }
+
           case ParseStatus::reject:
+          {
             response_.status_code(StatusCode::Not_Found);
             write_payload();
-            return;
+            break;
+          }
           default:
-            return;
+            break;
           }
         }
       });
