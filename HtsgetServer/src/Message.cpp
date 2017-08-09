@@ -2,9 +2,11 @@
 #include <cassert>
 #include <string>
 #include <utility>
+#include <vector>
 #include <algorithm>
 
 #include "Message.h"
+#include "Constants.h"
 
 namespace Http
 {
@@ -47,12 +49,19 @@ auto Message::get_header(HeaderNameType name) -> std::pair<HeaderValueType, bool
     return std::make_pair(val, valid);
 }
 
-void Message::set_header(HeaderNameType name, HeaderValueType value)
+auto Message::flatten_header() const -> std::string
 {
-    auto header = std::make_pair(name, value);
+    std::string headers_flat;
+    for (auto &header : headers_)
+        headers_flat += header.first + ": " + header.second + EOL;
+    return headers_flat + EOL;
+}
+
+void Message::set_header(HeaderType header)
+{
     auto found = find_if(headers_.begin(), headers_.end(),
-                         [&](auto &header) {
-                             return header.first == name;
+                         [&](auto &h) {
+                             return h.first == header_name(header);
                          });
     if (found != headers_.end())
         *found = header;
@@ -77,14 +86,14 @@ auto Message::content_length() -> int
 
     if (found)
         return std::atoi(val.c_str());
-    else
-        set_header("Content-Length", "0");
+
+    set_header({"Content-Length", "0"});
     return 0;
 }
 
 void Message::content_length(int length)
 {
-    set_header("Content-Length", std::to_string(length));
+    set_header({"Content-Length", std::to_string(length)});
 }
 
 auto Message::content_type() -> HeaderValueType
@@ -96,13 +105,13 @@ auto Message::content_type() -> HeaderValueType
     if (found)
         return val;
     else
-        set_header("Content-Type", "");
+        set_header({"Content-Type", ""});
     return "";
 }
 
 void Message::content_type(HeaderValueType value)
 {
-    set_header("Content-Type", value);
+    set_header({"Content-Type", value});
 }
 
 auto operator<<(std::ostream &strm, Message::HeaderType &header) -> std::ostream &

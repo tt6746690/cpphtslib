@@ -30,12 +30,16 @@ public:
    */
   auto get_header(HeaderNameType name) -> std::pair<HeaderValueType, bool>;
   /**
+   * @brief   Concatenates header key:value pair 
+   */
+  auto flatten_header() const -> std::string;
+  /**
    * @brief   Sets header with given name and value
    * 
    * Overwrites existing header if name matches, 
    * otherwise appends header to end of headers_
    */
-  void set_header(HeaderNameType name, HeaderValueType value);
+  void set_header(HeaderType);
   /**
    * @brief   Removes header with given name
    */

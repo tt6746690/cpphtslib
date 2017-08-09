@@ -27,7 +27,9 @@ int main()
 
         app->router_.get("/home",
                          Handler([](Context &ctx) {
-                             cout << "GET /home" << endl;
+                             ctx.res_.set_header({"foo", "bar"});
+                             ctx.res_.status_code(StatusCode::OK);
+                             ctx.res_.write("here is /home");
                          }));
 
         app->router_.get("/home/level2",

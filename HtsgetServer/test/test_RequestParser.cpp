@@ -38,7 +38,7 @@ TEST_CASE("Uri", "[RequestParser]")
         REQUIRE(req.uri_.scheme_ == "");
         REQUIRE(req.uri_.host_ == "");
         REQUIRE(req.uri_.port_ == "");
-        REQUIRE(req.uri_.abs_path_ == "~smith/home.html");
+        REQUIRE(req.uri_.abs_path_ == "/~smith/home.html");
         REQUIRE(req.uri_.fragment_ == "footer");
     }
 }
@@ -67,7 +67,7 @@ TEST_CASE("Overall", "[RequestParser]")
         parser.parse(req, std::begin(payload), std::end(payload));
 
         REQUIRE(req.method_ == RequestMethod::GET);
-        REQUIRE(req.uri_.abs_path_ == "hi");
+        REQUIRE(req.uri_.abs_path_ == "/hi");
         REQUIRE(req.version_major_ == 1);
         REQUIRE(req.version_minor_ == 0);
         REQUIRE(req.headers_.size() == 3);

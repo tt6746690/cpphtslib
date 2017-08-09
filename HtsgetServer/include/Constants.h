@@ -6,6 +6,8 @@
 namespace Http
 {
 
+constexpr char EOL[] = "\r\n";
+
 /**
  * Uri
  */

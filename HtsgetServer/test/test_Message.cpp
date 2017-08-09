@@ -37,8 +37,8 @@ TEST_CASE("Message::Manipulate header member", "[Message]")
 
     SECTION("manipulate headers")
     {
-        msg.set_header("foo", "bar");
-        msg.set_header("bar", "baz");
+        msg.set_header({"foo", "bar"});
+        msg.set_header({"bar", "baz"});
         REQUIRE(msg.headers_.size() == 3);
 
         SECTION("get_header")
@@ -56,7 +56,7 @@ TEST_CASE("Message::Manipulate header member", "[Message]")
 
         SECTION("set_header")
         {
-            msg.set_header("foo", "barbar");
+            msg.set_header({"foo", "barbar"});
             REQUIRE(msg.headers_.size() == 3);
 
             auto found = std::find_if(msg.headers_.begin(), msg.headers_.end(), [](auto &header) {

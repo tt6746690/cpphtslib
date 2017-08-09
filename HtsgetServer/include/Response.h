@@ -19,8 +19,7 @@ public:
   /**
    * @brief   Generates response string
    */
-  auto
-  to_payload() const -> std::string;
+  auto to_payload() const -> std::string;
 
   /**
    * @brief   gets/Sets status code for response
@@ -59,7 +58,7 @@ public:
    *        sets content-type to application/json
    */
   void
-  write(std::string string);
+  write(std::string data);
 
 private:
   StatusCode status_code_ = StatusCode::OK; // defaults to 200 OK

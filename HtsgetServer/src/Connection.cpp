@@ -33,9 +33,9 @@ void Connection::read_payload()
         if (!ec)
         {
 
-          // #ifndef NDEBUG
-          std::cout << std::string{buffer_.data(),
-                                   buffer_.data() + bytes_read};
+          // // #ifndef NDEBUG
+          // std::cout << std::string{buffer_.data(),
+          //                          buffer_.data() + bytes_read};
           // #endif
 
           decltype(buffer_.begin()) begin;
@@ -43,8 +43,6 @@ void Connection::read_payload()
 
           std::tie(begin, parse_status) = request_parser_.parse(
               request_, buffer_.begin(), buffer_.begin() + bytes_read);
-
-          // std::cout << request_ << std::endl;
 
           /**
            * Current buffer is fully read, branch on ParseStatus
@@ -64,21 +62,25 @@ void Connection::read_payload()
           }
           case ParseStatus::accept:
           {
-            auto handlers = router_.resolve(request_.method_, request_.uri_.abs_path_);
+            response_.status_code(StatusCode::OK);
+            response_.version_major_ = request_.version_major_;
+            response_.version_minor_ = request_.version_minor_;
 
+            auto handlers = router_.resolve(request_.method_, request_.uri_.abs_path_);
             for (auto &handler : handlers)
             {
               handler(context_);
             }
 
-            response_.status_code(StatusCode::OK);
+            std::cout << response_ << std::endl;
+
             write_payload();
             break;
           }
 
           case ParseStatus::reject:
           {
-            response_.status_code(StatusCode::Not_Found);
+            response_.status_code(StatusCode::Bad_Request);
             write_payload();
             break;
           }
@@ -93,7 +95,8 @@ void Connection::write_payload()
 {
   asio::async_write(
       socket_,
-      asio::buffer(response_.to_payload()), asio::transfer_all(),
+      asio::buffer(response_.to_payload()),
+      asio::transfer_all(),
       [ this, self = shared_from_this() ](std::error_code ec, std::size_t bytes_written) {
         if (!ec)
         {
