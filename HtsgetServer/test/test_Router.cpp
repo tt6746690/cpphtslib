@@ -37,11 +37,24 @@ TEST_CASE("handle, resolves", "[Router]")
         });
         r.handle(RequestMethod::GET, "/home/bar", home_bar_handle);
 
-        REQUIRE(r.routes_[0].size() == 3);
-        REQUIRE(home_foo_handle.handler_id_ == 1);
-        REQUIRE(home_bar_handle.handler_id_ == 2);
+        SECTION("Simple handle")
+        {
+            REQUIRE(r.routes_[0].size() == 3);
+            REQUIRE(home_foo_handle.handler_id_ == 1);
+            REQUIRE(home_bar_handle.handler_id_ == 2);
+        }
 
-        SECTION("resolve")
+        SECTION("handles multiple methods")
+        {
+            r.handle({RequestMethod::GET, RequestMethod::POST}, "/in_both_methods", home_bar_handle);
+
+            auto in_both_methods_get = r.resolve(RequestMethod::GET, "/in_both_methods");
+            auto in_both_methods_post = r.resolve(RequestMethod::POST, "/in_both_methods");
+            REQUIRE(!in_both_methods_get.empty());
+            REQUIRE(!in_both_methods_post.empty());
+        }
+
+        SECTION("resolve handles")
         {
             auto handles = r.resolve(RequestMethod::GET, "/home");
             REQUIRE(handles.size() == 1);

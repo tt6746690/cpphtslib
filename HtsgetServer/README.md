@@ -58,8 +58,6 @@
                 + as `host:port`
             + `ContentLength`
             + `TransferEncoding`
-        + body 
-            + non-empty server side, return EOF if no body present
 + _response_
     + represent response
         + Status `200 OK`

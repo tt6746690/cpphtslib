@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <tuple>
 
 #include "Request.h"
 #include "Response.h"
@@ -82,6 +83,13 @@ class Router
         assert(path.front() == '/');
         auto &route = routes_[etoint(method)];
         route.insert({path, handler});
+    }
+
+    template <typename Container = std::vector<RequestMethod>>
+    auto handle(Container methods, std::string path, T handler) -> void
+    {
+        for (const auto &method : methods)
+            handle(method, path, handler);
     }
 
     /**

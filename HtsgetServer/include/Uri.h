@@ -57,6 +57,7 @@ public:
    */
   auto static urldecode(std::string &url) -> std::string;
 
+public:
   friend auto operator<<(std::ostream &strm, Uri uri) -> std::ostream &;
 };
 }
