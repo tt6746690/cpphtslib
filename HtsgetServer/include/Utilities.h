@@ -2,6 +2,7 @@
 #define UTILITIES_H
 
 #include <iostream>
+#include <sstream>
 #include <utility>
 #include <string>
 #include <type_traits>
@@ -230,15 +231,26 @@ static constexpr char uri_charset[] =
     "opqrstuvwxyz0123456789-_.~!*'();:@&=+$,/"
     "?#[]";
 
-constexpr bool is_uri(char c)
+constexpr bool is_uri_unreserved(char c)
 {
-    for (auto b = std::begin(uri_charset), e = std::end(uri_charset);
+    for (auto b = std::begin(unreserved_charset),
+              e = std::end(unreserved_charset);
          b != e; b++)
     {
         if (c == *b)
-        {
             return true;
-        }
+    }
+    return false;
+}
+
+constexpr bool is_uri(char c)
+{
+    for (auto b = std::begin(uri_charset),
+              e = std::end(uri_charset);
+         b != e; b++)
+    {
+        if (c == *b)
+            return true;
     }
     return false;
 }

@@ -9,11 +9,15 @@
 namespace Http
 {
 
+/**
+ * @brief   Converts 1 utf8 byte to its hex value
+ */
+auto ctohex(unsigned int c) -> std::string;
+
 class Uri
 {
 public:
   /* Assume only accepting Url for now*/
-  std::string url_;
   std::string scheme_;
   std::string host_;
   std::string port_;
@@ -29,6 +33,19 @@ public:
    * @precondition  c is valid uri char
    */
   auto consume(char c) -> ParseStatus;
+
+  /**
+   * @brief   Impl of url encoding/decoding schemes
+   * 
+   * @precond assumes utf8 encoded string
+   * 
+   * -- No need to encode unreserved charset
+   * -- Percent encode reserved charset, 
+   *  --  convert each char (ASCII or non-ASCII) to utf-8
+   *  --  Represenet byte value with hex digits, preceded by %
+   */
+  auto static urlencode(std::string &url) -> std::string;
+  auto static urldecode(std::string &url) -> std::string;
 
   friend auto operator<<(std::ostream &strm, Uri uri) -> std::ostream &;
 };

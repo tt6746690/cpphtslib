@@ -4,41 +4,6 @@
 ### Planning 
 
 
-+ _radix tree_ 
-    + space-optimized tree
-        + each node that is the only child is merged with its parent
-+ _Trie_ 
-    + `Node`
-        + parent `*Node`
-        + children as a map from `char` to `Node*`
-        + data `T` 
-            + data associated with this node, i.e. the char array from root to this node
-    + `Trie`
-        + a root `Node`
-        + size
-    + _operation_ 
-        + `merge(iterator pos)`
-            + check if `pos` has 1 child, if so merge child to `pos`
-        + `insert(key, data) -> pair<iterator, bool>`
-            + data appended to linked list at the node 
-            + `iterator` points to inserted node
-            + may have to split / merge ... 
-        + `erase(iterator pos) -> iterator`
-            + removes the element 
-                + search
-                + remove,
-                + call `merge` if applicable
-        + _search_ `O(k)` where `k` is max length of key string
-            + `predecessor`
-                + largest string less than a given key 
-            + `successor`
-                + smallest string larger than a given key
-            + `prefixSearch(key) -> string[]`
-                + return array of string with common prefix 
-            + `find(key) -> pair<Node, bool>`
-        + `preorder_traversal()`
-
-
 
 + _RequestRouter_ (mux)
     + responsible for 

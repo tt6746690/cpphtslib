@@ -7,6 +7,32 @@
 namespace Http
 {
 
+auto ctohex(unsigned int c) -> std::string
+{
+    std::ostringstream os;
+    os << std::hex << std::uppercase << c;
+    return os.str();
+}
+
+auto Uri::urlencode(std::string &url) -> std::string
+{
+    if (url.empty())
+        return {};
+
+    std::string encoded{};
+    for (unsigned char c : url)
+    {
+        if (is_uri_unreserved(c))
+            encoded += c;
+        else
+            encoded.append("%" + ctohex(c));
+    }
+    return encoded;
+}
+auto static Uri::urldecode(std::string url) -> std::string
+{
+}
+
 /* 
     Request-URI    = "*" | absoluteURI | abs_path | authority
 
