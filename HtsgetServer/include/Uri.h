@@ -35,9 +35,14 @@ public:
   auto consume(char c) -> ParseStatus;
 
   /**
-   * @brief   Impl of url encoding/decoding schemes
+   * @brief   Decodes fields in uri 
+   */
+  auto decode() -> void;
+  /**
+   * @brief   encode url
    * 
-   * @precond assumes utf8 encoded string
+   * @precond assumes utf8 encoded string 
+   *          assumes url consists of uri allowed charset
    * 
    * -- No need to encode unreserved charset
    * -- Percent encode reserved charset, 
@@ -45,6 +50,11 @@ public:
    *  --  Represenet byte value with hex digits, preceded by %
    */
   auto static urlencode(std::string &url) -> std::string;
+  /**
+   * @brief   decode url
+   * 
+   * @precond assumes url consists of uri allowed charset
+   */
   auto static urldecode(std::string &url) -> std::string;
 
   friend auto operator<<(std::ostream &strm, Uri uri) -> std::ostream &;

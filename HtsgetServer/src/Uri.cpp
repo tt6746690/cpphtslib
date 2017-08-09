@@ -1,4 +1,5 @@
 #include <ostream>
+#include <cstdio>
 
 #include "Uri.h"
 #include "Constants.h"
@@ -14,23 +15,63 @@ auto ctohex(unsigned int c) -> std::string
     return os.str();
 }
 
+auto Uri::decode() -> void
+{
+    scheme_ = urldecode(scheme_);
+    host_ = urldecode(host_);
+    abs_path_ = urldecode(abs_path_);
+    query_ = urldecode(query_);
+    fragment_ = urldecode(fragment_);
+}
+
 auto Uri::urlencode(std::string &url) -> std::string
 {
     if (url.empty())
         return {};
 
     std::string encoded{};
-    for (unsigned char c : url)
+    for (auto c : url)
     {
         if (is_uri_unreserved(c))
             encoded += c;
         else
-            encoded.append("%" + ctohex(c));
+            encoded.append("%" + ctohex(static_cast<unsigned char>(c)));
     }
     return encoded;
 }
-auto static Uri::urldecode(std::string url) -> std::string
+
+/*
+bytes bits  1st/lst code point  byte1       byte2       byte3       byte4
+    1	7	U+0000	U+007F	    0xxxxxxx			
+    2	11	U+0080	U+07FF	    110xxxxx	10xxxxxx		
+    3	16	U+0800	U+FFFF	    1110xxxx	10xxxxxx	10xxxxxx	
+    4	21	U+10000	U+10FFFF	11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
+ */
+auto Uri::urldecode(std::string &url) -> std::string
 {
+    if (url.empty())
+        return {};
+
+    std::string decoded{};
+    char c;
+    int cvt;
+
+    for (auto itr = url.cbegin(); itr != url.cend(); ++itr)
+    {
+        c = *itr;
+        if (c != '%')
+        {
+            decoded += c;
+        }
+        else
+        {
+            std::string hexhex{itr + 1, itr + 3};
+            sscanf(hexhex.c_str(), "%x", &cvt);
+            decoded += static_cast<unsigned char>(cvt);
+            itr += 2;
+        }
+    }
+    return decoded;
 }
 
 /* 

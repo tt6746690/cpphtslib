@@ -141,6 +141,7 @@ auto RequestParser::consume(Request &request, char c) -> ParseStatus
         }
         if (is_sp(c))
         {
+            request.uri_.decode(); // decode fields here...
             state_ = s::req_http_h;
             return status::in_progress;
         }
