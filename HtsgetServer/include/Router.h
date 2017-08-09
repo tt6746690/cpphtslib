@@ -37,25 +37,10 @@ class Handler
     explicit Handler(HandlerFunc handler)
         : handler_(handler), handler_id_(handler_count) { ++handler_count; };
 
-    operator bool() const
-    {
-        return handler_ != nullptr;
-    }
-
-    void operator()(Context &ctx)
-    {
-        handler_(ctx);
-    }
-
-    bool operator==(const Handler &rhs)
-    {
-        return handler_id_ == rhs.handler_id_;
-    }
-
-    bool operator!=(const Handler &rhs)
-    {
-        return !(operator==(rhs));
-    }
+    operator bool() const { return handler_ != nullptr; }
+    void operator()(Context &ctx) { handler_(ctx); }
+    bool operator==(const Handler &rhs) { return handler_id_ == rhs.handler_id_; }
+    bool operator!=(const Handler &rhs) { return !(operator==(rhs)); }
 
     HandlerFunc handler_;
     int handler_id_;

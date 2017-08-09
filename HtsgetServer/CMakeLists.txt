@@ -8,7 +8,7 @@ project(HtsgetServer)
 set(HEADER_ONLY_INCLUDE 
     ../lib/asio-1.10.6/include
     ../lib/Catch/single_include
-    ../lib/sparsepp)
+    ../lib/json/src)
 
 # # include directory
 include_directories(include)
@@ -16,15 +16,6 @@ include_directories(SYSTEM ${HEADER_ONLY_INCLUDE})
 
 # server
 set(SOURCE_FILES 
-    src/Server.cpp 
-    src/Connection.cpp
-    src/Message.cpp
-    src/Request.cpp
-    src/RequestParser.cpp
-    src/Response.cpp
-    src/Utilities.cpp
-    src/Uri.cpp
-    src/Router.cpp
     include/Server.h
     include/Connection.h 
     include/Message.h 
@@ -36,6 +27,13 @@ set(SOURCE_FILES
     include/Constants.h
     include/Router.h
     include/Trie.h
+    src/Server.cpp 
+    src/Connection.cpp
+    src/Message.cpp
+    src/Request.cpp
+    src/RequestParser.cpp
+    src/Response.cpp
+    src/Uri.cpp
 )
 
 add_executable(server main.cpp ${SOURCE_FILES})
@@ -53,12 +51,3 @@ set(TEST_FILES
 
 add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
 
-
-# target_link_libraries(server lib)
-
-# find_package(Boost 1.64.0 REQUIRED COMPONENTS system regex thread date_time)
-# if(Boost_FOUND)
-#     include_directories(${Boost_INCLUDE_DIRS})
-#     add_executable(server ${SOURCE_FILES})
-#     target_link_libraries(server ${Boost_LIBRARIES} htslib)
-# endif()
