@@ -3,14 +3,15 @@
 
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
+#include <iostream>
+#include <algorithm>
 
 #include "Request.h"
 #include "Response.h"
 #include "Constants.h"
 #include "Trie.h"
-
-#include <iostream>
 
 namespace Http
 {
@@ -19,26 +20,68 @@ struct Context
 {
     Request &req_;
     Response &res_;
+
+    Context(Request &req, Response &res)
+        : req_(req), res_(res){};
 };
 
-using Handler = std::function<void(Context)>;
+static int handler_count = 0;
 
-template <typename X = Handler>
+class Handler
+{
+  public:
+    using HandlerFunc = std::function<void(Context &)>;
+
+    explicit Handler() : handler_(nullptr){};
+    explicit Handler(HandlerFunc handler)
+        : handler_(handler), handler_id_(handler_count) { ++handler_count; };
+
+    operator bool() const
+    {
+        return handler_ != nullptr;
+    }
+
+    void operator()(Context &ctx)
+    {
+        handler_(ctx);
+    }
+
+    bool operator==(const Handler &rhs)
+    {
+        return handler_id_ == rhs.handler_id_;
+    }
+
+    bool operator!=(const Handler &rhs)
+    {
+        return !(operator==(rhs));
+    }
+
+    HandlerFunc handler_;
+    int handler_id_;
+
+  public:
+    friend auto inline operator<<(std::ostream &strm, Handler &handler) -> std::ostream &
+    {
+        return strm << "(" << handler.handler_id_ << ")";
+    }
+};
+
+template <typename T>
 class Router
 {
   public:
     explicit Router()
-        : tries_(method_count){};
+        : routes_(method_count){};
     /**
      * @brief   Registers handler for provided method + path
      * 
      * @precond path starts with /
      */
-    auto handle(RequestMethod method, std::string path, X handler) -> void
+    auto handle(RequestMethod method, std::string path, T handler) -> void
     {
         assert(path.front() == '/');
-        auto trie = tries_[etoint(method)];
-        trie.insert(path, handler);
+        auto &route = routes_[etoint(method)];
+        route.insert({path, handler});
     }
 
     /**
@@ -46,27 +89,44 @@ class Router
      * 
      *          If no matching path is found, the sequence is empty
      */
-    auto resolve(RequestMethod method, std::string path) -> std::vector<X>
+    auto resolve(RequestMethod method, std::string path) -> std::vector<T>
     {
-        auto trie = tries_[etoint(method)];
-        auto found = trie.find(path);
+        auto &route = routes_[etoint(method)];
+        auto found = route.find(path);
 
-        if (found == trie.end())
+        if (found == route.end())
             return {};
 
-        std::vector<X> handle_sequence;
+        std::vector<T> handle_sequence;
 
-        while (found != trie.end())
+        while (found != route.end())
         {
             if (*found)
                 handle_sequence.push_back(*found);
             --found;
         }
+
+        std::reverse(handle_sequence.begin(), handle_sequence.end());
         return handle_sequence;
     }
 
   public:
-    std::vector<Trie<X>> tries_;
+    std::vector<Trie<T>> routes_;
+
+  public:
+    friend auto inline operator<<(std::ostream &strm, Router r) -> std::ostream &
+    {
+        for (int i = 0; i < method_count; ++i)
+        {
+            auto &trie = r.routes_[i];
+            if (trie.size_ != 0)
+            {
+                strm << Request::request_method_to_string(static_cast<RequestMethod>(i)) << std::endl;
+                strm << trie << std::endl;
+            }
+        }
+        return strm;
+    }
 };
 }
 

@@ -33,6 +33,20 @@ auto constexpr constexpr_strlen(const char *s) -> size_t
     return length;
 }
 
+template <typename T, typename = void>
+struct is_callable : std::is_function<T>
+{
+};
+
+template <typename T>
+struct is_callable<
+    T,
+    typename std::enable_if<
+        std::is_same<
+            decltype(void(&T::operator())), void>::value>::type> : std::true_type
+{
+};
+
 template <typename T, typename Key>
 auto has_key(const T &container, const Key &key) -> bool
 {

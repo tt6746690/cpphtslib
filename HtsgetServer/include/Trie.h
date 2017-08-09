@@ -33,6 +33,7 @@ public:
   using node_ptr = TrieNode *;
   using trie_ptr = Trie *;
   using uniq_node_ptr = std::unique_ptr<TrieNode>;
+  using shared_node_ptr = std::shared_ptr<TrieNode>;
 
 public:
   /**
@@ -81,7 +82,7 @@ public:
     }
     bool operator!=(const TrieIterator &rhs) const
     {
-      return !(this == rhs);
+      return !(operator==(rhs));
     }
 
     mapped_type &operator*() const
@@ -118,7 +119,7 @@ public:
   };
 
   Trie()
-      : root_(std::make_unique<TrieNode>(nullptr)), size_(0){};
+      : root_(std::make_shared<TrieNode>(nullptr)), size_(0){};
 
   /**
    * @brief   Iterator related functions
@@ -297,8 +298,13 @@ public:
     return std::make_pair(curr, std::string{key.substr(pos, len)});
   }
 
+  size_t size() const
+  {
+    return size_;
+  }
+
 public:
-  uniq_node_ptr root_;
+  shared_node_ptr root_;
   size_t size_ = 0;
 
 private:
@@ -339,7 +345,6 @@ private:
   }
   auto newNode(node_ptr parent) -> uniq_node_ptr
   {
-    size_ += 1;
     return std::make_unique<TrieNode>(parent);
   }
 
@@ -380,6 +385,10 @@ public:
   {
     return node.get()->child_.at(prefix).get();
   }
+  friend inline auto get_child(const shared_node_ptr &node, std::string prefix) -> node_ptr
+  {
+    return node.get()->child_.at(prefix).get();
+  }
 
   friend inline auto operator<<(std::ostream &strm, Trie &t) -> std::ostream &
   {
@@ -395,7 +404,7 @@ public:
     {
       depth += 2;
       for (auto &item : node.child_)
-        strm << std::string(depth, ' ') << depth / 2 << "|-" << item.first << "\\"
+        strm << std::string(depth, ' ') << depth / 2 << "|-" << item.first
              << *item.second.get();
       depth -= 2;
     }

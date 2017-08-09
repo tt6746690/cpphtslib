@@ -38,7 +38,7 @@ TEST_CASE("Trie Full example", "[Trie]")
             |-s\        smiles
             |-d\        smiled
     */
-    std::cout << t << std::endl;
+    // std::cout << t << std::endl;
 
     SECTION("find")
     {
