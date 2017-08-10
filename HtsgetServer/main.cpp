@@ -22,7 +22,10 @@ int main()
 
         app->router_.get("/",
                          Handler([](Context &ctx) {
-                             cout << "GET /" << endl;
+                             ctx.res_.write(
+                                 "<!doctype html><head></head><body><p>Hello world </p></body></html>");
+                             ctx.res_.status_code(StatusCode::OK);
+                             ctx.res_.content_type("text/html; charset=utf-8");
                          }));
 
         app->router_.get("/home",

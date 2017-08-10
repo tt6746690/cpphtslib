@@ -92,10 +92,17 @@ class Router
     {
         handle(RequestMethod::PUT, path, handler);
     }
-
+    auto use(std::string path, T handler) -> void
+    {
+        for (int method = static_cast<int>(RequestMethod::GET);
+             method != static_cast<int>(RequestMethod::UNDETERMINED);
+             ++method)
+        {
+            handle(static_cast<RequestMethod>(method), path, handler);
+        }
+    }
     /**
      * @brief   Resolve path to a sequence of handler calls
-     * 
      *          If no matching path is found, the sequence is empty
      */
     auto resolve(RequestMethod method, std::string path) -> std::vector<T>
@@ -119,6 +126,7 @@ class Router
         return handle_sequence;
     }
 
+  
   public:
     std::vector<Trie<T>> routes_;
 
