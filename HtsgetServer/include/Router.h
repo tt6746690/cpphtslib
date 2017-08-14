@@ -86,19 +86,19 @@ class Router
     /**
      * @brief   Handle wrapper functions 
      */
-    auto get(std::string path, T handler) -> void
+    auto get(std::string path, T handler = T()) -> void
     {
         handle(RequestMethod::GET, path, handler);
     }
-    auto post(std::string path, T handler) -> void
+    auto post(std::string path, T handler = T()) -> void
     {
         handle(RequestMethod::POST, path, handler);
     }
-    auto put(std::string path, T handler) -> void
+    auto put(std::string path, T handler = T()) -> void
     {
         handle(RequestMethod::PUT, path, handler);
     }
-    auto use(std::string path, T handler) -> void
+    auto use(std::string path, T handler = T()) -> void
     {
         for (int method = static_cast<int>(RequestMethod::GET);
              method != static_cast<int>(RequestMethod::UNDETERMINED);

@@ -2,6 +2,7 @@
 #include <string>
 #include <utility>
 #include "asio.hpp"
+#include "json.hpp"
 
 #include "Response.h"
 #include "Constants.h"
@@ -46,11 +47,25 @@ auto Response::to_status_line(
            status_code_to_reason(status_code) + EOL;
 }
 
-auto Response::write(std::string data) -> void
+auto Response::write_text(std::string data) -> void
 {
-    content_type("text/plain");
+    if (data.find("<!doctype html>") == 0)
+        content_type("text/html; charset=utf-8");
+    else
+        content_type("text/plain");
+
     content_length(content_length() + data.size());
     body_ += data;
+}
+
+auto Response::write_json(json_type data) -> void
+{
+    std::string dump = data.dump(4);
+
+    content_type("application/json");
+    content_length(content_length() + dump.size());
+
+    body_ += dump;
 }
 
 std::ostream &

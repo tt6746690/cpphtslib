@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #include "Utilities.h"
+#include "json.hpp"
 
 namespace Http
 {
@@ -10,6 +11,12 @@ namespace Http
  * types
  */
 using ssmap = std::unordered_map<std::string, std::string>;
+using json_type = nlohmann::json;
+
+// struct json_type
+// {
+//     nlohmann::json json;
+// }
 
 constexpr char EOL[] = "\r\n";
 

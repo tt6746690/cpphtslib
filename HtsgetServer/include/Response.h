@@ -3,6 +3,7 @@
 
 #include <array>
 #include "asio.hpp"
+#include "json.hpp"
 
 #include "Message.h"
 #include "Utilities.h"
@@ -43,7 +44,7 @@ public:
       int http_version_minor = 1) -> std::string;
 
   /**
-   * @brief   Write to body
+   * @brief   Append to body and set corresponding content-{type, length}
    * 
    * Types: 
    *    string
@@ -57,8 +58,8 @@ public:
    *    json, 
    *        sets content-type to application/json
    */
-  void
-  write(std::string data);
+  auto write_text(std::string data) -> void;
+  auto write_json(json_type data) -> void;
 
 private:
   StatusCode status_code_ = StatusCode::OK; // defaults to 200 OK
