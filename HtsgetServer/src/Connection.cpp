@@ -66,7 +66,7 @@ void Connection::read_payload()
             response_.version_major_ = request_.version_major_;
             response_.version_minor_ = request_.version_minor_;
 
-            auto handlers = router_.resolve(request_.method_, request_.uri_.abs_path_);
+            auto handlers = router_.resolve(request_);
             for (auto &handler : handlers)
             {
               handler(context_);

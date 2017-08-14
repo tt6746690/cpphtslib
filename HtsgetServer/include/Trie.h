@@ -51,9 +51,17 @@ public:
     node_ptr parent_ = nullptr;
     std::unordered_map<std::string, uniq_node_ptr> child_;
 
+  public:
     explicit TrieNode(){};
     explicit TrieNode(node_ptr parent, T data = T())
         : data_(data), parent_(parent){};
+
+    bool operator==(const TrieNode &rhs) const
+    {
+      return (data_ == rhs.data_) &&
+             (parent_ == rhs.parent_) &&
+             (child_ == rhs.child_);
+    }
   };
 
   /**
@@ -76,9 +84,7 @@ public:
 
     bool operator==(const TrieIterator &rhs) const
     {
-      return (node_->parent_ == rhs.node_->parent_) &&
-             (node_->data_ == rhs.node_->data_) &&
-             (node_->child_ == rhs.node_->child_);
+      return (*node_ == *(rhs.node_));
     }
     bool operator!=(const TrieIterator &rhs) const
     {
@@ -115,6 +121,13 @@ public:
       iterator result = *this;
       ++(*this);
       return result;
+    }
+
+  public:
+    friend inline auto operator<<(std::ostream &strm, TrieIterator &itr) -> std::ostream &
+    {
+      strm << "[itr]" << itr.node_ << std::endl;
+      return strm;
     }
   };
 
@@ -187,6 +200,7 @@ public:
               std::make_pair(common_prefix, newNode(node, value)));
           auto branch_node = node->child_.at(common_prefix).get();
 
+          prev_node->parent_ = branch_node;
           branch_node->child_.emplace(
               std::make_pair(prev_suffix, std::unique_ptr<TrieNode>(prev_node)));
           return iterator(this, branch_node);
@@ -202,6 +216,7 @@ public:
               std::make_pair(common_prefix, newNode(node)));
           auto branch_node = get_child(node, common_prefix);
 
+          prev_node->parent_ = branch_node;
           branch_node->child_.emplace(
               std::make_pair(prev_suffix, std::unique_ptr<TrieNode>(prev_node)));
 
@@ -259,7 +274,54 @@ public:
         }
       }
     }
+
     return end();
+  }
+
+  auto find_match(const std::string &key, std::string &param) -> iterator
+  {
+    auto found = find(key);
+    if (found != end())
+      return found;
+
+    /* test if its a match against <param> */
+    for (const auto &value : found.node_->child_)
+    {
+      auto k = value.first;
+      if (k.front() == '<')
+      {
+        param = std::string{k.begin() + 1, k.end() - 1};
+        return iterator(this, get_child(found.node_, k));
+      }
+    }
+    return end();
+  }
+
+  /**
+   * @brief   Returns the prefix held by an iterator 
+   */
+  auto prefix_of(iterator curr) -> std::string
+  {
+    std::string prefix;
+    iterator parent = iterator(this, curr.node_->parent_);
+
+    while (curr != end())
+    {
+      auto found = std::find_if(
+          (parent.node_)->child_.begin(), (parent.node_)->child_.end(),
+          [&](auto const &p) {
+            return p.second.get() == curr.node_;
+          });
+      assert(found != (parent.node_)->child_.end());
+
+      prefix = (*found).first + prefix;
+
+      --curr;
+      if (!(parent == end()))
+        --parent;
+    }
+
+    return prefix;
   }
 
   /** 
@@ -390,13 +452,14 @@ public:
     return node.get()->child_.at(prefix).get();
   }
 
-  friend inline auto operator<<(std::ostream &strm, Trie &t) -> std::ostream &
+  friend inline auto operator<<(std::ostream &strm, const Trie &t) -> std::ostream &
   {
     strm << "\\" << *t.root_ << std::endl;
     strm << "size: " << t.size_ << std::endl;
     return strm;
   }
-  friend inline auto operator<<(std::ostream &strm, TrieNode &node) -> std::ostream &
+
+  friend inline auto operator<<(std::ostream &strm, const TrieNode &node) -> std::ostream &
   {
     static size_t depth = 0;
     strm << "\t" << node.data_ << std::endl;

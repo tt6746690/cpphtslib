@@ -16,7 +16,7 @@ TEST_CASE("Construct routes", "[Server]")
     GenericServer::ServerAddr server_address = make_pair("127.0.0.1", 8888);
     auto app = make_unique<GenericServer>(server_address);
 
-    SECTION("route 1")
+    SECTION("serverroute")
     {
         app->router_.get("/",
                          Handler([](Context &ctx) {
@@ -33,7 +33,12 @@ TEST_CASE("Construct routes", "[Server]")
                              cout << "GET /home" << endl;
                          }));
 
-        app->router_.get("/account/bar",
+        app->router_.get("/home/level2/level3",
+                         Handler([](Context &ctx) {
+                             cout << "GET /home/level2/level3" << endl;
+                         }));
+
+        app->router_.get("/account/bar/baz",
                          Handler([](Context &ctx) {
                              cout << "GET /acocunt/bar" << endl;
                          }));
@@ -53,8 +58,8 @@ TEST_CASE("Construct routes", "[Server]")
                               cout << "POST /account/bar" << endl;
                           }));
 
-        std::cout << app->router_ << std::endl;
+        // std::cout << app->router_ << std::endl;
 
-        server->run();
+        // app->run();
     }
 }

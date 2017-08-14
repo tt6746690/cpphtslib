@@ -61,6 +61,10 @@ class Router
     /**
      * @brief   Registers handler for provided method + path
      * 
+     *  Rules
+     *      -- specify named url parameter in angle brackets 
+     *          -- /books/<id>
+     * 
      * @precond path starts with /
      */
     auto handle(RequestMethod method, std::string path, T handler) -> void
@@ -105,13 +109,24 @@ class Router
      * @brief   Resolve path to a sequence of handler calls
      *          If no matching path is found, the sequence is empty
      */
-    auto resolve(RequestMethod method, std::string path) -> std::vector<T>
+    auto resolve(Request req) -> std::vector<T>
     {
+        auto method = req.method_;
+        auto path = req.uri_.abs_path_;
         auto &route = routes_[etoint(method)];
-        auto found = route.find(path);
+
+        std::string url_param;
+        auto found = route.find_match(path, url_param);
 
         if (found == route.end())
             return {};
+
+        // if (!url_param.empty())
+        // {
+        //     req.param_.insert({
+        //         url_param,
+        //     })
+        // }
 
         std::vector<T> handle_sequence;
 
@@ -126,7 +141,25 @@ class Router
         return handle_sequence;
     }
 
-  
+    auto resolve(RequestMethod method, std::string path) -> std::vector<T>
+    {
+        auto &route = routes_[etoint(method)];
+        auto found = route.find(path);
+        if (found == route.end())
+            return {};
+        std::vector<T> handle_sequence;
+
+        while (found != route.end())
+        {
+            if (*found)
+                handle_sequence.push_back(*found);
+            --found;
+        }
+
+        std::reverse(handle_sequence.begin(), handle_sequence.end());
+        return handle_sequence;
+    }
+
   public:
     std::vector<Trie<T>> routes_;
 

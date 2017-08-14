@@ -40,6 +40,24 @@ TEST_CASE("Trie Full example", "[Trie]")
     */
     // std::cout << t << std::endl;
 
+    SECTION("prefix_of")
+    {
+        iterator found;
+        std::string prefix;
+
+        found = t.find("smil");
+        prefix = t.prefix_of(found);
+        REQUIRE(prefix == "smil");
+
+        found = t.find("smile");
+        prefix = t.prefix_of(found);
+        REQUIRE(prefix == "smile");
+
+        found = t.find("smiled");
+        prefix = t.prefix_of(found);
+        REQUIRE(prefix == "smiled");
+    }
+
     SECTION("find")
     {
         auto smil = get_child(t.root_, "smil");

@@ -47,6 +47,7 @@ set(TEST_FILES
     test/test_Trie.cpp
     test/test_Router.cpp
     test/test_Uri.cpp
+    test/test_Server.cpp
 )
 
 add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})

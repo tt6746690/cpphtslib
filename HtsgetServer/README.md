@@ -3,6 +3,13 @@
 
 ### Planning 
 
+Routing properties
+ 
++ url usually deliminated with `/` so most likely a node contains 
+    + `/`: as root
+    + `foo/`: if has more than one children (routes at next level)
+    + `/bar`: if its parent have one children only
+
 
 
 + _RequestRouter_ (mux)
