@@ -109,25 +109,12 @@ class Router
      * @brief   Resolve path to a sequence of handler calls
      *          If no matching path is found, the sequence is empty
      */
-    auto resolve(Request req) -> std::vector<T>
+    auto resolve(RequestMethod method, std::string path) -> std::vector<T>
     {
-        auto method = req.method_;
-        auto path = req.uri_.abs_path_;
         auto &route = routes_[etoint(method)];
-
-        std::string url_param;
-        auto found = route.find_match(path, url_param);
-
+        auto found = route.find(path);
         if (found == route.end())
             return {};
-
-        // if (!url_param.empty())
-        // {
-        //     req.param_.insert({
-        //         url_param,
-        //     })
-        // }
-
         std::vector<T> handle_sequence;
 
         while (found != route.end())
@@ -140,13 +127,21 @@ class Router
         std::reverse(handle_sequence.begin(), handle_sequence.end());
         return handle_sequence;
     }
-
-    auto resolve(RequestMethod method, std::string path) -> std::vector<T>
+    auto resolve(Request &req) -> std::vector<T>
     {
+        auto method = req.method_;
+        auto path = req.uri_.abs_path_;
         auto &route = routes_[etoint(method)];
-        auto found = route.find(path);
+
+        std::string param_key, param_value;
+        auto found = route.find(path, param_key, param_value);
+
         if (found == route.end())
             return {};
+
+        if (!param_key.empty() && !param_value.empty())
+            req.param_.insert({param_key, param_value});
+
         std::vector<T> handle_sequence;
 
         while (found != route.end())

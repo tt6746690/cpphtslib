@@ -277,21 +277,44 @@ public:
 
     return end();
   }
-
-  auto find_match(const std::string &key, std::string &param) -> iterator
+  auto find(const std::string &key, std::string &param_key, std::string &param_value) -> iterator
   {
-    auto found = find(key);
-    if (found != end())
-      return found;
+    std::string prefix;
+    auto suffix_size = key.size();
+    auto curr = root_.get();
+    int len, pos;
+
+    for (len = 1, pos = 0; len <= suffix_size; len++)
+    {
+      prefix = key.substr(pos, len);
+      if (curr->child_.count(prefix))
+      {
+        if (len == suffix_size)
+        {
+          return iterator(this, get_child(curr, prefix));
+        }
+        else
+        {
+          pos += len;
+          suffix_size -= len;
+          len = 0;
+          curr = get_child(curr, prefix);
+        }
+      }
+    }
 
     /* test if its a match against <param> */
-    for (const auto &value : found.node_->child_)
+    for (const auto &value : curr->child_)
     {
       auto k = value.first;
       if (k.front() == '<')
       {
-        param = std::string{k.begin() + 1, k.end() - 1};
-        return iterator(this, get_child(found.node_, k));
+        /* Assuming url parameter matching is unique, 
+          prefix string will be in one node */
+        param_key = std::string{k.begin() + 1, k.end() - 1};
+        param_value = key.substr(pos);
+
+        return iterator(this, get_child(curr, k));
       }
     }
     return end();

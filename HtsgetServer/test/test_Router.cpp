@@ -69,5 +69,24 @@ TEST_CASE("handle, resolves", "[Router]")
             handles = r.resolve(RequestMethod::POST, "/home/bar");
             REQUIRE(handles.size() == 0);
         }
+
+        SECTION("resolve url with parameter")
+        {
+            // auto resolve(Request req)->std::vector<T>
+
+            r.handle(RequestMethod::GET, "/home/<id>", Handler([](Context &ctx) {
+                         std::cout << "Handler: GET /reads/<id>" << std::endl;
+                     }));
+
+            std::cout << r << std::endl;
+
+            req.uri_.abs_path_ = "/home/102938";
+            req.method_ = RequestMethod::GET;
+
+            auto handles = r.resolve(req);
+            REQUIRE(handles.size() == 2);
+            REQUIRE_NOTHROW(req.param_.find("id"));
+            REQUIRE(req.param_["id"] == "102938");
+        }
     }
 }
