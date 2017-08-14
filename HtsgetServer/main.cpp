@@ -6,6 +6,7 @@
 // #define NDEBUG
 
 #include "Server.h"
+#include "Uri.h"
 
 using namespace std;
 using namespace asio;
@@ -20,45 +21,26 @@ int main()
         GenericServer::ServerAddr server_address = make_pair("127.0.0.1", 8888);
         auto app = make_unique<GenericServer>(server_address);
 
-        app->router_.get("/",
+        /* url query parser middleware */
+        app->router_.get("/reads/",
                          Handler([](Context &ctx) {
+                             ctx.req_.query_ = Uri::make_query(ctx.req_.uri_.query_);
+                         }));
+
+        app->router_.get("/reads/<id>",
+                         Handler([](Context &ctx) {
+
+                             auto foo = ctx.query_["foo"];
+                             auto id = ctx.param_["id"];
+
                              ctx.res_.write(
-                                 "<!doctype html><head></head><body><p>Hello world </p></body></html>");
+                                 "<!doctype html><head></head><body><p>query[foo]= " + foo + "  param[id]= " + id + "</p></body></html>");
+
                              ctx.res_.status_code(StatusCode::OK);
                              ctx.res_.content_type("text/html; charset=utf-8");
-                         }));
 
-        app->router_.get("/home",
-                         Handler([](Context &ctx) {
-                             ctx.res_.set_header({"foo", "bar"});
-                             ctx.res_.status_code(StatusCode::OK);
-                             ctx.res_.write("here is /home");
+                             std::cout << ctx.res_ << std::endl;
                          }));
-
-        app->router_.get("/home/level2",
-                         Handler([](Context &ctx) {
-                             cout << "GET /home/level2" << endl;
-                         }));
-
-        app->router_.get("/account/bar",
-                         Handler([](Context &ctx) {
-                             cout << "GET /account/bar" << endl;
-                         }));
-
-        app->router_.get("/account/bar",
-                         Handler([](Context &ctx) {
-                             cout << "GET /account/bar" << endl;
-                         }));
-
-        app->router_.get("/account/foo",
-                         Handler([](Context &ctx) {
-                             cout << "GET /account/foo" << endl;
-                         }));
-
-        app->router_.post("/account/bar",
-                          Handler([](Context &ctx) {
-                              cout << "POST /account/bar" << endl;
-                          }));
 
         std::cout << app->router_ << std::endl;
         app->run();

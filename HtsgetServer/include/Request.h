@@ -17,8 +17,10 @@ class Request : public Message
 
 public:
   RequestMethod method_ = RequestMethod::UNDETERMINED;
+
   Uri uri_;
-  std::unordered_map<std::string, std::string> param_;
+  ssmap param_;
+  ssmap query_;
 
   constexpr static const char *request_method_to_string(RequestMethod method)
   {

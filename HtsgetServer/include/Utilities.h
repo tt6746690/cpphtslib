@@ -6,12 +6,22 @@
 #include <utility>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <typeinfo>
 #include <cstddef>
 #include <unordered_map>
 
 namespace Http
 {
+
+static inline auto split(std::string s, char delim) -> std::pair<std::string, std::string>
+{
+    auto pos = s.find(delim);
+    if (pos != std::string::npos)
+        return std::make_pair(s.substr(0, pos), s.substr(pos + 1));
+    else
+        return std::make_pair("", "");
+}
 
 auto constexpr constexpr_streq(const char *x, const char *y) -> bool
 {

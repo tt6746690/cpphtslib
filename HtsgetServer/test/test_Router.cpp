@@ -72,13 +72,11 @@ TEST_CASE("handle, resolves", "[Router]")
 
         SECTION("resolve url with parameter")
         {
-            // auto resolve(Request req)->std::vector<T>
-
             r.handle(RequestMethod::GET, "/home/<id>", Handler([](Context &ctx) {
                          std::cout << "Handler: GET /reads/<id>" << std::endl;
                      }));
 
-            std::cout << r << std::endl;
+            // std::cout << r << std::endl;
 
             req.uri_.abs_path_ = "/home/102938";
             req.method_ = RequestMethod::GET;

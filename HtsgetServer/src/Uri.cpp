@@ -67,6 +67,28 @@ auto Uri::urldecode(std::string &url) -> std::string
     return decoded;
 }
 
+auto Uri::make_query(const std::string &qstr) -> ssmap
+{
+    constexpr char tok_and = '&';
+    constexpr char tok_equal = '=';
+
+    std::string query = qstr;
+    query += tok_and;
+
+    std::size_t pos = 0;
+    std::string token, key, value;
+    ssmap query_map;
+
+    while ((pos = query.find(tok_and)) != std::string::npos)
+    {
+        token = query.substr(0, pos);
+        std::tie(key, value) = split(token, tok_equal);
+        query_map.insert({key, value});
+        query.erase(0, pos + 1);
+    }
+    return query_map;
+}
+
 /* 
     Request-URI    = "*" | absoluteURI | abs_path | authority
 

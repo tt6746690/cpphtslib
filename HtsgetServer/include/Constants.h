@@ -6,6 +6,11 @@
 namespace Http
 {
 
+/**
+ * types
+ */
+using ssmap = std::unordered_map<std::string, std::string>;
+
 constexpr char EOL[] = "\r\n";
 
 /**

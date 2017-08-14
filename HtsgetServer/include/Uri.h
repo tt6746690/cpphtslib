@@ -57,6 +57,11 @@ public:
    */
   auto static urldecode(std::string &url) -> std::string;
 
+  /**
+   * @brief   Convert a query string to a map of key-value pairs
+   */
+  auto static make_query(const std::string &query) -> ssmap;
+
 public:
   friend auto operator<<(std::ostream &strm, Uri uri) -> std::ostream &;
 };

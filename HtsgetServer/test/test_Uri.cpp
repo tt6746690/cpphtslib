@@ -48,4 +48,13 @@ TEST_CASE("uri encoding/decoding", "[Uri]")
         REQUIRE(uri.host_ == "zh.wikipedia.org");
         REQUIRE(uri.abs_path_ == "/wiki/百分号编码");
     }
+
+    SECTION("make query")
+    {
+        auto query = Uri::make_query("foo=bar&a=d,s,d");
+        REQUIRE_NOTHROW(query.at("foo"));
+        REQUIRE(query["foo"] == "bar");
+        REQUIRE_NOTHROW(query.at("a"));
+        REQUIRE(query["a"] == "d,s,d");
+    }
 }

@@ -32,12 +32,6 @@ void Connection::read_payload()
 
         if (!ec)
         {
-
-          // // #ifndef NDEBUG
-          // std::cout << std::string{buffer_.data(),
-          //                          buffer_.data() + bytes_read};
-          // #endif
-
           decltype(buffer_.begin()) begin;
           ParseStatus parse_status;
 
@@ -71,8 +65,6 @@ void Connection::read_payload()
             {
               handler(context_);
             }
-
-            std::cout << response_ << std::endl;
 
             write_payload();
             break;

@@ -21,9 +21,11 @@ struct Context
 {
     Request &req_;
     Response &res_;
+    ssmap &param_;
+    ssmap &query_;
 
     Context(Request &req, Response &res)
-        : req_(req), res_(res){};
+        : req_(req), res_(res), param_(req.param_), query_(req.query_){};
 };
 
 static int handler_count = 0;

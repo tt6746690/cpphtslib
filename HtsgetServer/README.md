@@ -101,9 +101,9 @@ Routing properties
     - [ ] Follow pan-GA4GH standards,
         - [ ] POST, redirects, and non-reads data will follow protobuf3 compatible JSON
 + _essentials_ 
-    - [ ] API makes to HTTP(S) endpoints, receive URL-encoded query string param, return JSON outputs
-        - [ ] HTTP status 200 for success 
-        - [ ] UTF8-encoded JSON in response body, with `application/json` content-type
+    - [x] API makes to HTTP(S) endpoints, receive URL-encoded query string param, return JSON outputs
+        - [x] HTTP status 200 for success 
+        - [x] UTF8-encoded JSON in response body, with `application/json` content-type
         - [ ] Server implements chunked transfer encoding 
         - [ ] client/server negotiate HTTP/2 upgrade 
     - [ ] timestamp in response in [ISO 8061](https://www.iso.org/iso-8601-date-and-time-format.html) format (with `<ctime>`)
@@ -120,7 +120,7 @@ Routing properties
     - [ ] API resources should support [CORS](https://www.w3.org/TR/cors/) for browser support
     - [ ] A request with `Origin` header will be propagated to `Access-Control-Allow-Origin` header of response
 + _Methods_
-    - [ ] `GET /reads/<id>`, 
+    - [x] `GET /reads/<id>`, 
         - [ ] response with json containing a `ticket` allowing caller to obtain data in specified format
         - [ ] Client may need to filter out extraneous records, i.e. want reads overlapping a region but may include reads not overlapping 
         - [ ] Successful request with empty result set still produce valid response in requested format (header + EOF)
