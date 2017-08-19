@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 
+
 #define BOOST_ASIO_ENABLE_HANDLER_TRACKING // debugging
 // #define NDEBUG
 
@@ -15,6 +16,7 @@
 #include "Response.h"
 
 #include "Common.h"
+#include <cstdlib>
 
 using namespace asio;
 using namespace Http;
@@ -42,44 +44,48 @@ int main()
                              std::cout << std::setw(4) << urlparse << std::endl;
                          }));
 
-        app->router_.get("/home", Handler([](Context &ctx) {
-                             ctx.res_.write_text("<!doctype html><head></head><body><p> /home </p></body></html>");
-                         }));
-
-        /*  
-            curl --http1.1 -v -X GET '127.0.0.1:8888/NotFound/'
-        */
-        app->router_.get("/NotFound", Handler([](Context &ctx) {
-                            send_error(ctx, ResErrorType::NotFound, "No such accession 'ENS16232164'");
-                         }));
-
         /* 
             curl --http1.1 -v -X GET '127.0.0.1:8888/reads/reads_id?format=BAM&referenceName=chr1&start=0&end=1000&fields=QNAME,FLAG,POS'
         */
-
         app->router_.get("/reads/");
-        app->router_.get("/reads/<id>",
-                         Handler([](Context &ctx) {
+        app->router_.get("/reads/<id>", Handler([](Context &ctx){
 
-                             auto foo = ctx.query_["foo"];
-                             auto id = ctx.param_["id"];
+            auto format = ctx.query_["format"];
+            if(!format.empty() && 
+                format != "BAM" && 
+                format != "CRAM")
+                return send_error(ctx, ResErrorType::UnsupportedFormat, 
+                    "The requested file format " + format + " is not supported by the server");
 
-                             std::vector<std::string> urls{
-                                 "127.0.0.1:8888/data/1",
-                                 "127.0.0.1:8888/data/2",
-                                 "127.0.0.1:8888/data/3",
-                                 "127.0.0.1:8888/data/4",
-                             };
+            auto referenceName = ctx.query_["referenceName"];
+            auto start = ctx.query_["start"];
+            auto end = ctx.query_["end"];
 
-                             json_type res = {
-                                 {"format", ctx.query_["format"]},
-                                 {"urls", urls},
-                                 {"md5", "md5_checksum_here"},
-                             };
 
-                             ctx.res_.write_json(res);
-                             ctx.res_.content_type("application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
-                         }));
+            if(referenceName.empty() && (!start.empty() || !end.empty()))
+                return send_error(ctx, ResErrorType::InvalidInput, 
+                    "Request parameter: start/end specified but referenceName unspecified");
+
+            if((start.empty() && !end.empty()) || (!start.empty() && end.empty()))
+                return send_error(ctx, ResErrorType::InvalidInput, 
+                    "Request parameter: both start and end must be present/absent");
+            
+            unsigned long int startul = 0;
+            unsigned long int endul = 0; 
+
+            if(!start.empty() && !end.empty()){
+                startul = strtoul(start.c_str(), NULL, 10);
+                endul = strtoul(end.c_str(), NULL, 10);
+                if(startul > endul)
+                    return send_error(ctx, ResErrorType::InvalidRange, 
+                        "Request parameter: start is greater than end");
+            }
+
+            ctx.res_.write_json(format_res(ctx));
+            
+        }));
+
+        
 
         std::cout << app->router_ << std::endl;
         app->run();

@@ -68,6 +68,56 @@ auto send_error(Context& ctx, ResErrorType error, std::string message) -> void
 }
 
 
+/**
+ * {
+   "htsget" : {
+      "format" : "BAM",
+      "urls" : [
+         {
+            "url" : "data:application/vnd.ga4gh.bam;base64,QkFNAQ=="
+         },
+         {
+            "url" : "https://htsget.blocksrv.example/sample1234/header"
+         },
+         {
+            "url" : "https://htsget.blocksrv.example/sample1234/run1.bam",
+            "headers" : {
+               "Authorization" : "Bearer xxxx",
+               "Range" : "bytes=65536-1003750"
+             }
+         },
+         {
+            "url" : "https://htsget.blocksrv.example/sample1234/run1.bam",
+            "headers" : {
+               "Authorization" : "Bearer xxxx",
+               "Range" : "bytes=2744831-9375732"
+            }
+         }
+      ]
+   }
+}
+*/
+auto format_res(Context & ctx) -> json_type 
+{
+    std::vector<std::string> urls{
+        "127.0.0.1:8888/data/1",
+        "127.0.0.1:8888/data/2",
+        "127.0.0.1:8888/data/3",
+        "127.0.0.1:8888/data/4",
+    };
+
+    json_type res = {
+        {"format", ctx.query_["format"]},
+        {"urls", urls},
+        {"md5", "md5_checksum_here"},
+    };
+
+    ctx.res_.content_type("application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
+
+    return res;
+}
+
+
 
 }
 
