@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 
-#include "Encoding.h"
+#include "Codec.h"
 
 using namespace Http;
 
@@ -17,17 +17,17 @@ auto test_encoding(std::pair<std::string, std::string> in_out) -> void {
     auto input = byte_array(in.begin(), in.end());
     auto output = byte_array(out.begin(), out.end());
 
-    auto input_encoded = base64_encode(input);
+    auto input_encoded = Base64Codec::encode(input);
     REQUIRE(input_encoded == output);
 
-    auto in_encoded = base64_encode(in);
+    auto in_encoded = Base64Codec::encode(in);
     REQUIRE(in_encoded == output);
 }
 
 
-TEST_CASE("base64 encoding/decoding", "[Encoding]")
+TEST_CASE("base64 encoding/decoding", "[Codec]")
 {
-
+    
    
     SECTION("base64 encoding")
     {

@@ -27,7 +27,7 @@ set(SOURCE_FILES
     include/Constants.h
     include/Router.h
     include/Trie.h
-    include/Encoding.h
+    include/Codec.h
     src/Server.cpp 
     src/Connection.cpp
     src/Message.cpp
@@ -50,7 +50,7 @@ set(TEST_FILES
     test/test_Router.cpp
     test/test_Uri.cpp
     test/test_Server.cpp
-    test/test_Encoding.cpp
+    test/test_Codec.cpp
 )
 
 add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
