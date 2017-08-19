@@ -73,15 +73,6 @@ Routing properties
         + headers 
         + body 
         + compression ? 
-+ _responsewriter_ 
-    + used by http handler to construct http response
-        + `writeHeader()`
-        + `write()` data to connection as part of HTTP reply
-            + calls `writeHeader(OK)` before writing 
-            + and sets `Content-Type` 
-            + reading request body before writing response
-
-
 ### Resources
 
 + configure include path for `c_cpp_properties.json` with `gcc -xc++ -E -v -`

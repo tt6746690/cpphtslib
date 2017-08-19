@@ -29,6 +29,11 @@ public:
   void status_code(StatusCode status_code);
 
   /**
+   * @brief   Convert Status code from int to enum type 
+   */
+  auto static to_status_code(int status_code) -> StatusCode;
+
+  /**
    * @brief   Gets reason phrase for this instance
    */
   auto reason_phrase() -> std::string;
@@ -40,6 +45,11 @@ public:
   auto status_line() const -> std::string;
   auto static to_status_line(
       StatusCode status_code,
+      int http_version_major = 1,
+      int http_version_minor = 1) -> std::string;
+  auto static to_status_line(
+      int status_code,
+      std::string reason,
       int http_version_major = 1,
       int http_version_minor = 1) -> std::string;
 
@@ -60,6 +70,11 @@ public:
    */
   auto write_text(std::string data) -> void;
   auto write_json(json_type data) -> void;
+
+  /**
+   * @brief   Clears body and resets size 
+   */
+  auto clear_body() -> void;
 
 private:
   StatusCode status_code_ = StatusCode::OK; // defaults to 200 OK

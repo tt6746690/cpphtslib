@@ -13,11 +13,6 @@ namespace Http
 using ssmap = std::unordered_map<std::string, std::string>;
 using json_type = nlohmann::json;
 
-// struct json_type
-// {
-//     nlohmann::json json;
-// }
-
 constexpr char EOL[] = "\r\n";
 
 /**
@@ -164,6 +159,9 @@ enum class StatusCode
     Gateway_Timeout,
     HTTP_Version_Not_Supported
 };
+
+constexpr int status_code_count =
+    etoint(StatusCode::HTTP_Version_Not_Supported) - etoint(StatusCode::Continue) + 1;
 
 enum class ResponseHeaderName
 {

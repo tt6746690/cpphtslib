@@ -12,17 +12,17 @@
 #include "Server.h"
 #include "Uri.h"
 #include "Utilities.h"
+#include "Response.h"
+
+#include "Common.h"
 
 using namespace asio;
 using namespace Http;
+using namespace HtsgetServer;
 using nlohmann::json;
 
 int main()
 {
-
-    /* 
-        curl --http1.1 -v -X GET '127.0.0.1:8888/reads/reads_id?format=BAM&referenceName=chr1&start=0&end=1000&fields=QNAME,FLAG,POS'
-    */
 
     try
     {
@@ -46,6 +46,17 @@ int main()
                              ctx.res_.write_text("<!doctype html><head></head><body><p> /home </p></body></html>");
                          }));
 
+        /*  
+            curl --http1.1 -v -X GET '127.0.0.1:8888/NotFound/'
+        */
+        app->router_.get("/NotFound", Handler([](Context &ctx) {
+                            send_error(ctx, ResErrorType::NotFound, "No such accession 'ENS16232164'");
+                         }));
+
+        /* 
+            curl --http1.1 -v -X GET '127.0.0.1:8888/reads/reads_id?format=BAM&referenceName=chr1&start=0&end=1000&fields=QNAME,FLAG,POS'
+        */
+
         app->router_.get("/reads/");
         app->router_.get("/reads/<id>",
                          Handler([](Context &ctx) {
@@ -67,6 +78,7 @@ int main()
                              };
 
                              ctx.res_.write_json(res);
+                             ctx.res_.content_type("application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
                          }));
 
         std::cout << app->router_ << std::endl;

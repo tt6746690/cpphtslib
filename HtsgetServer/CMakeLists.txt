@@ -34,6 +34,7 @@ set(SOURCE_FILES
     src/RequestParser.cpp
     src/Response.cpp
     src/Uri.cpp
+    Common.h
 )
 
 add_executable(server main.cpp ${SOURCE_FILES})
