@@ -2,16 +2,13 @@
 #define CONNECTION_H
 
 #include "Request.h"
-#include "Response.h"
 #include "RequestParser.h"
+#include "Response.h"
 #include "Router.h"
 
-namespace Http
-{
+namespace Http {
 
-class Connection
-    : public std::enable_shared_from_this<Connection>
-{
+class Connection : public std::enable_shared_from_this<Connection> {
 public:
   explicit Connection(asio::ip::tcp::socket socket, Router<Handler> &router)
       : socket_(std::move(socket)), router_(router){};

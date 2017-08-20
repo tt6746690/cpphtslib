@@ -9,11 +9,9 @@
 
 #include "Router.h"
 
-namespace Http
-{
+namespace Http {
 
-class GenericServer
-{
+class GenericServer {
 public:
   using ServerAddr = std::pair<std::string, int>;
 
@@ -22,14 +20,12 @@ public:
   GenericServer &operator=(const GenericServer &) = delete;
 
   explicit GenericServer(const ServerAddr &server_address)
-      : server_address_(server_address),
-        io_service_(),
-        acceptor_(io_service_),
+      : server_address_(server_address), io_service_(), acceptor_(io_service_),
         socket_(io_service_) {}
 
   /**
    * @brief   Starts the server
-   *  Initiate io_service event loop, 
+   *  Initiate io_service event loop,
    *  acceptor instantiates and queues connection
    */
   void run();

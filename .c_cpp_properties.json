@@ -10,7 +10,9 @@
         "/usr/include",
         "/System/Library/Frameworks",
         "/Library/Frameworks",
-        "./lib"
+        "./lib",
+        "./Http",
+        "./Server"
       ],
       "defines": [],
       "browse": {
@@ -23,7 +25,9 @@
           "/usr/include",
           "/System/Library/Frameworks",
           "/Library/Frameworks",
-          "./lib"
+          "./lib",
+          "./Http",
+          "./Server"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""

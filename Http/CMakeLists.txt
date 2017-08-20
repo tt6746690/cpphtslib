@@ -25,7 +25,6 @@ set(SOURCE_FILES
     src/Server.cpp 
     src/Connection.cpp
     src/Message.cpp
-    src/Request.cpp
     src/RequestParser.cpp
     src/Response.cpp
     src/Uri.cpp

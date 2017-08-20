@@ -1,17 +1,15 @@
 #ifndef HEADER_H
 #define HEADER_H
 
+#include <list>
 #include <ostream>
+#include <string>
 #include <utility> // pair
 #include <vector>
-#include <list>
-#include <string>
 
-namespace Http
-{
+namespace Http {
 
-class Message
-{
+class Message {
 public:
   using HeaderNameType = std::string;
   using HeaderValueType = std::string;
@@ -19,24 +17,24 @@ public:
 
   /**
    * @brief   appends a char to name/value of last header in headers
-   * 
+   *
    * @pre headers_ must be nonempty
    */
   void build_header_name(char c);
   void build_header_value(char c);
 
   /**
-   * @brief   Gets header with given name 
+   * @brief   Gets header with given name
    */
   auto get_header(HeaderNameType name) -> std::pair<HeaderValueType, bool>;
   /**
-   * @brief   Concatenates header key:value pair 
+   * @brief   Concatenates header key:value pair
    */
   auto flatten_header() const -> std::string;
   /**
    * @brief   Sets header with given name and value
-   * 
-   * Overwrites existing header if name matches, 
+   *
+   * Overwrites existing header if name matches,
    * otherwise appends header to end of headers_
    */
   void set_header(HeaderType);
@@ -46,7 +44,7 @@ public:
   void unset_header(HeaderNameType name);
 
   /**
-     * @brief   Gets/Sets commonly used headers 
+     * @brief   Gets/Sets commonly used headers
      */
   auto content_length() -> int;
   void content_length(int length);
@@ -60,12 +58,11 @@ public:
 
 public:
   /**
-   * @brief   Return HTTP version 
+   * @brief   Return HTTP version
    */
-  static auto
-  version(int major, int minor) -> std::string;
+  static auto version(int major, int minor) -> std::string;
 
-  /** 
+  /**
    * @brief   Given a header, return its name/value
    */
   static auto header_name(HeaderType &header) -> HeaderNameType &;
