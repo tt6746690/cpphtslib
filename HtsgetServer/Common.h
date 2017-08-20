@@ -97,7 +97,7 @@ auto send_error(Context& ctx, ResErrorType error, std::string message) -> void
    }
 }
 */
-auto format_res(Context & ctx) -> json_type 
+auto format_ticket(Context & ctx) -> json_type 
 {
     std::vector<std::string> urls{
         "127.0.0.1:8888/data/1",

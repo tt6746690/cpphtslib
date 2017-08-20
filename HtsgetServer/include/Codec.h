@@ -1,5 +1,5 @@
-#ifndef ENCODING_H
-#define ENCODING_H
+#ifndef CODEC_H
+#define CODEC_H
 
 // reference http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c
 
@@ -166,15 +166,6 @@ public:
 
 };
 
-
-
-
-
-
-
 }
-
-
-
 
 #endif 

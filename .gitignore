@@ -4,6 +4,7 @@ log
 build/
 bin/
 lib/
+data/
 
 learn/code
 

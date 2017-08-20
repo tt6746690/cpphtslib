@@ -17,6 +17,7 @@
 
 #include "Common.h"
 #include <cstdlib>
+#include <cstdio>
 
 using namespace asio;
 using namespace Http;
@@ -45,10 +46,10 @@ int main()
                          }));
 
         /* 
-            curl --http1.1 -v -X GET '127.0.0.1:8888/reads/reads_id?format=BAM&referenceName=chr1&start=0&end=1000&fields=QNAME,FLAG,POS'
+            curl --http1.1 -v -X GET '127.0.0.1:8888/reads/reads_id?format=BAM&referenceName=chr1&start=10145&end=10150&fields=QNAME,FLAG,POS'
         */
         app->router_.get("/reads/");
-        app->router_.get("/reads/<id>", Handler([](Context &ctx){
+        app->router_.get("/reads/<id>", Handler([](Context &ctx){            
 
             auto format = ctx.query_["format"];
             if(!format.empty() && 
@@ -60,7 +61,6 @@ int main()
             auto referenceName = ctx.query_["referenceName"];
             auto start = ctx.query_["start"];
             auto end = ctx.query_["end"];
-
 
             if(referenceName.empty() && (!start.empty() || !end.empty()))
                 return send_error(ctx, ResErrorType::InvalidInput, 
@@ -81,9 +81,27 @@ int main()
                         "Request parameter: start is greater than end");
             }
 
-            ctx.res_.write_json(format_res(ctx));
+            std::string command = "samtools view -h ./data/test.bam " + referenceName + ":" + start + "-" + end;
+
+
+            int bytes_read;
+            unsigned char buf[100];
+            FILE* fp = popen(command.c_str(), "r");
+
+            if(!fp)
+                exit(1);
             
+            while((bytes_read = std::fread(buf, 1, 100, fp)) > 0){
+                ctx.res_.write_text(std::string(buf, buf + bytes_read));
+            }
+
+            if(!fclose(fp))
+                exit(1);
+            
+            // ctx.res_.write_json(format_ticket(ctx));
+             
         }));
+
 
         
 
