@@ -1,6 +1,6 @@
 # version and project name
 cmake_minimum_required(VERSION 2.6)
-project(HtsgetServer)
+project(Htsget)
 
 # compiler
 set(CMAKE_CXX_COMPILER_ID "Clang")
@@ -16,9 +16,19 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF) 
 
+# header only libraries libraries 
+set(HEADER_ONLY_INCLUDE 
+    ../lib/asio-1.10.6/include
+    ../lib/Catch/single_include
+    ../lib/json/src)
+
 # add subdirectories 
-add_subdirectory(${PROJECT_SOURCE_DIR}/HtsgetServer)
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
+set(Http_SOURCE_DIR ${PROJECT_SOURCE_DIR}/Http)
+set(Lib_SOURCE_DIR ${PROJECT_SOURCE_DIR}/lib)
+set(Server_SOURCE_DIR ${PROJECT_SOURCE_DIR}/Server)
+add_subdirectory(${Http_SOURCE_DIR})
+add_subdirectory(${Lib_SOURCE_DIR})
+add_subdirectory(${Server_SOURCE_DIR})
 
 
 # cmake -H. -Bbuild -Wno-dev

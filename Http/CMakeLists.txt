@@ -1,16 +1,10 @@
-project(HtsgetServer)
+project(Http)
 
 # cmake -H. -Bbuild -Wno-dev
 # cmake --build build -- -j3
 # ./bin/server
 
-# header only libraries libraries 
-set(HEADER_ONLY_INCLUDE 
-    ../lib/asio-1.10.6/include
-    ../lib/Catch/single_include
-    ../lib/json/src)
-
-# # include directory
+# include directory and set up lib dependencies
 include_directories(include)
 include_directories(SYSTEM ${HEADER_ONLY_INCLUDE})
 
@@ -35,11 +29,10 @@ set(SOURCE_FILES
     src/RequestParser.cpp
     src/Response.cpp
     src/Uri.cpp
-    Common.h
 )
 
 add_executable(server main.cpp ${SOURCE_FILES})
-
+add_library(Http ${SOURCE_FILES})
 
 # test
 set(TEST_FILES
