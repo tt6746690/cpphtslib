@@ -15,8 +15,6 @@
 #include "Utilities.h"
 
 #include "Common.h"
-#include <cstdio>
-#include <cstdlib>
 
 using namespace asio;
 using namespace Http;
@@ -84,22 +82,10 @@ int main() {
           std::string command = "samtools view -h ./data/test.bam " +
                                 referenceName + ":" + start + "-" + end;
 
-          int bytes_read;
-          unsigned char buf[100];
-          FILE *fp = popen(command.c_str(), "r");
-
-          if (!fp) {
-            std::cout << "h1";
-            exit(1);
-          }
-
-          while ((bytes_read = std::fread(buf, 1, 100, fp)) > 0) {
-            ctx.res_.write_text(std::string(buf, buf + bytes_read));
-          }
-
-          if (!pclose(fp)) {
-            std::cout << "h2";
-            exit(1);
+          Popen proc{command, "r"};
+          std::string result;
+          while (!(result = proc.read()).empty()) {
+            ctx.res_.write_text(result);
           }
 
           // ctx.res_.write_json(format_ticket(ctx));
