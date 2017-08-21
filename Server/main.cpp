@@ -53,6 +53,9 @@ int main() {
                               "The requested file format " + format +
                                   " is not supported by the server");
 
+          if (format.empty())
+            format = "BAM";
+
           auto referenceName = ctx.query_["referenceName"];
           auto start = ctx.query_["start"];
           auto end = ctx.query_["end"];
@@ -79,7 +82,10 @@ int main() {
                                 "Request parameter: start is greater than end");
           }
 
-          std::string command = "samtools view ./data/test.bam " + // -b  -h
+          /**
+           * Outputs requested bam to temporary file,
+           */
+          std::string command = "samtools view -bh ./data/test.bam " + // -b  -h
                                 referenceName + ":" + start + "-" + end;
 
           Popen proc{command, "r"};
