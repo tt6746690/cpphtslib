@@ -79,7 +79,7 @@ int main() {
                                 "Request parameter: start is greater than end");
           }
 
-          std::string command = "samtools view -h ./data/test.bam " +
+          std::string command = "samtools view ./data/test.bam " + // -b  -h
                                 referenceName + ":" + start + "-" + end;
 
           Popen proc{command, "r"};
@@ -91,6 +91,32 @@ int main() {
           // ctx.res_.write_json(format_ticket(ctx));
 
         }));
+
+    /*
+        curl --http1.1 -v -X GET -H "Range: bytes=65536-1003750"
+       '127.0.0.1:8888/data/test.bam'
+    */
+    app->router_.get("/data/");
+    app->router_.get("/data/<filename>", Handler([](Context &ctx) {
+                       std::string range;
+                       bool range_exists;
+                       std::tie(range, range_exists) =
+                           ctx.req_.get_header("Range");
+
+                       int start{};
+                       int end{};
+
+                       if (range_exists) {
+                         range = range.substr(range.find('=') + 1);
+                         start = std::stoi(range.substr(0, range.find('-')));
+                         end = std::stoi(range.substr(range.find('-') + 1));
+                       }
+
+                       ctx.res_.write_range("./data/" + ctx.param_["filename"] +
+                                                std::to_string(start) + "-" +
+                                                std::to_string(end),
+                                            range, "1000000");
+                     }));
 
     std::cout << app->router_ << std::endl;
     app->run();

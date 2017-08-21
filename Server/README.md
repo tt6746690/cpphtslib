@@ -1,5 +1,40 @@
 
 
+
+
+
+### Handle large file transfer over net 
+
+
++ html5 file api 
++ `resumable.js`
+    + fault tolerant, concurrent, resumable updates with html5 File API
+        + upload in chunks
+        + re-try if any chunk transfer fails...
+
+
+### Questions 
+
+
++ _Htsget_ 
+    + serving 
+        + _byte serving_ 
+        + _chunked encoding_ 
+    + `urls`
+        + how to logically divide up the requested region into `urls`
+        + how large are each payload
+    + _routing specifics_
+        + does server generates routes dyamically on the fly on request
+            + i.e. on receiving request, new routes created, which points to a range (in bytes) of data of a specific bam?
+    + _binary or text data_
+        + for now just sending output of `samtools view`
+        + is there a way to convert from human-readable `samtools view` to a valid `.bam` file
+
+
+### Resources
+
++ _byte serving with `Range` header_ [link](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests)
+
 ### Htsget [protocol](http://samtools.github.io/hts-specs/htsget.html)
 
 + _a data retrieval API for client/server model_
@@ -14,16 +49,16 @@
         - [x] UTF8-encoded JSON in response body, with `application/json` content-type
         - [ ] Server implements chunked transfer encoding 
         - [ ] client/server negotiate HTTP/2 upgrade 
-    - [ ] timestamp in response in [ISO 8061](https://www.iso.org/iso-8601-date-and-time-format.html) format (with `<ctime>`)
+    - [x] timestamp in response in [ISO 8061](https://www.iso.org/iso-8601-date-and-time-format.html) format (with `<ctime>`)
     - [ ] HTTP response compressed with [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html) `transfer-encoding` 
 + _Autentication_ 
     - [ ] Requests authenticated with OAuth2 bearer token, with [RFC 6750](https://tools.ietf.org/html/rfc6750)
         - [ ] client supplies header `Authorization: Bearer xxxx` with each HTTPS request
     - [ ] or just allow non-authenticated requests 
 + _Errors_
-    - [ ] Appropriate HTTP code return on error condition 
+    - [x] Appropriate HTTP code return on error condition 
     - [ ] in case of transient server error (503, other 5xx) client should implement retry logic 
-    - [ ] In case of error specific to `htsget` protocol, response body is a JSON of form `{error: errorType, message: msg}`
+    - [x] In case of error specific to `htsget` protocol, response body is a JSON of form `{error: errorType, message: msg}`
 + _CORS_
     - [ ] API resources should support [CORS](https://www.w3.org/TR/cors/) for browser support
     - [ ] A request with `Origin` header will be propagated to `Access-Control-Allow-Origin` header of response

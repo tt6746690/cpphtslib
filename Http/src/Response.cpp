@@ -61,6 +61,15 @@ auto Response::write_text(std::string data) -> void {
   body_ += data;
 }
 
+auto Response::write_range(std::string data, std::string range,
+                           std::string total) -> void {
+  set_header({"Content-Range", "bytes " + range + "/" + total});
+  content_length(content_length() + data.size());
+  status_code_ = StatusCode::Partial_Content;
+
+  body_ += data;
+}
+
 auto Response::write_json(json_type data) -> void {
   std::string dump = data.dump(4);
 

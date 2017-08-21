@@ -135,11 +135,12 @@ public:
   }
 
 private:
-  constexpr static int BUF_SIZE = 100;
+  constexpr static int BUF_SIZE = 1024;
   int bytes_read_;
   unsigned char buf_[BUF_SIZE];
   FILE *fp_;
 };
+
 }
 
 #endif

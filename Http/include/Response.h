@@ -63,6 +63,8 @@ public:
    *        sets content-type to application/json
    */
   auto write_text(std::string data) -> void;
+  auto write_range(std::string data, std::string range, std::string total)
+      -> void;
   auto write_json(json_type data) -> void;
 
   /**
