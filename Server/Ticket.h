@@ -25,12 +25,19 @@ public:
             urls.push_back(json_type{{"url", url.url}, {"headers", url.headers}});
         }
 
+        // json_type j = {
+        //     {"htsget", 
+        //         {{"format", format_},
+        //         {"urls", urls},
+        //         {"md5", checksum_}}
+        //     }
+        // };
+
         json_type j = {
             {"format", format_},
             {"urls", urls},
             {"md5", checksum_},
         };
-
         return j;
     }
 

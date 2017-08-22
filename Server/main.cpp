@@ -104,19 +104,21 @@ int main() {
 
           std::fstream bamslice;
           std::string f_relpath = config.TEMP_FILE_DIRECTORY + bamslicename;
-          std::string url_abspath = "127.0.0.1:8888/" + f_relpath;
+          std::string url_abspath = "http://127.0.0.1:8888/" + f_relpath;
           bamslice.open(f_relpath, std::ios::out);
 
           std::string result;
           Popen proc_pipe{command, "r"};
 
-          Ticket ticket("bam");
+          Ticket ticket(format);
           int bamslice_size = 0;
           while (!(result = proc_pipe.read()).empty()) {
             bamslice << result;
-            ticket.add_url({url_abspath, {{"Range", "bytes=" + std::to_string(bamslice_size) + "-" + std::to_string(bamslice_size + result.size())}, {"Bearer", "xxx"}} });
+            ticket.add_url({url_abspath, {{"Range", "bytes=" + std::to_string(bamslice_size) + "-" + std::to_string(bamslice_size + result.size())}} });
             bamslice_size += result.size();
           }
+
+          std::cout << std::setw(4) << ticket.to_json() << std::endl;
 
           ctx.res_.content_type(
               "application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
@@ -127,8 +129,8 @@ int main() {
     /*
         curl --http1.1 -v -X GET -H "Range: bytes=0-100" '127.0.0.1:8888/data/9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
     */
-    app->router_.get("/data/");
-    app->router_.get("/data/<filename>", Handler([&](Context &ctx) {
+    app->router_.get("/temp/");
+    app->router_.get("/temp/<filename>", Handler([&](Context &ctx) {
                        std::string range;
                        bool range_exists;
                        std::tie(range, range_exists) =
@@ -165,6 +167,9 @@ int main() {
                                     "Request parameter: start/end is greater than size of file");
 
                       char * buffer = new char[end-start];
+
+                      std::cout << std::string(buffer, end-start) << std::endl;
+
                       is.read(buffer, end-start);
                       ctx.res_.write_range(buffer, start, end, bamslice_size);
 
