@@ -109,14 +109,19 @@ int main() {
 
           std::string result;
           Popen proc_pipe{command, "r"};
+          auto checksum = SHA256Codec();
 
           Ticket ticket(format);
           int bamslice_size = 0;
           while (!(result = proc_pipe.read()).empty()) {
             bamslice << result;
+            checksum.update(result);
             ticket.add_url({url_abspath, {{"Range", "bytes=" + std::to_string(bamslice_size) + "-" + std::to_string(bamslice_size + result.size())}} });
             bamslice_size += result.size();
           }
+
+          checksum.finish();
+          ticket.checksum(checksum.get_hash());
 
           std::cout << std::setw(4) << ticket.to_json() << std::endl;
 
@@ -167,8 +172,6 @@ int main() {
                                     "Request parameter: start/end is greater than size of file");
 
                       char * buffer = new char[end-start];
-
-                      std::cout << std::string(buffer, end-start) << std::endl;
 
                       is.read(buffer, end-start);
                       ctx.res_.write_range(buffer, start, end, bamslice_size);

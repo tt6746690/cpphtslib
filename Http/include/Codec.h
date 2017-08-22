@@ -294,15 +294,16 @@ private:
     hash_[7] += h;
   }
 
+public:
   /**
    * @brief   Update hash_ by iterating over message blocks of M
    */
-  auto inline update(const BYTE_STRING &M) -> void {
+  auto inline update(const BYTE_STRING &message) -> void {
 
-    auto l = M.size();
+    auto l = message.size();
 
     for (int i = 0; i < l; ++i) {
-      blk_ += M[i];
+      blk_ += message[i];
       if (blk_.size() == 64) {
         transform();
         blk_.clear();
@@ -312,13 +313,16 @@ private:
     }
     bit_length_ += blk_.size() * 8;
   }
+  auto inline update(const std::string &message) -> void {
+    update(BYTE_STRING(message.begin(), message.end()));
+  }
 
   /**
    * @brief   Pad message M,
    *          parse into message blks, and
    *          setting initial hash value H
    */
-  auto inline pad() -> void {
+  auto inline finish() -> void {
 
     if (blk_.size() < 56) {
       blk_ += static_cast<uint8_t>(0x80);
@@ -358,24 +362,29 @@ private:
     std::cout.flags(f);
   }
 
-public:
   /**
    * @brief   Generate digests, in hexidecimal string
    */
-  auto inline digest(const BYTE_STRING &message) -> std::string {
-
-    update(message);
-    pad();
-
+  inline auto get_hash() -> std::string {
     std::ostringstream ss;
     for (int i = 0; i < 8; ++i)
       ss << std::setw(8) << std::setfill('0') << std::hex << hash_[i];
     return ss.str();
   }
 
+public:
+  /**
+   * @brief   Consumes entire message at once
+   */
+  auto inline digest(const BYTE_STRING &message) -> std::string {
+    update(message);
+    finish();
+    return get_hash();
+  }
   auto inline digest(const std::string &message) -> std::string {
     return digest(BYTE_STRING(message.begin(), message.end()));
   }
+
 
 private:
   BYTE_STRING blk_;
