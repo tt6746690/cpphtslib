@@ -336,14 +336,9 @@ private:
     assert(blk_.size() == 56);
 
     // last 8 bytes of blk_ holds message length in bits
-    blk_ += (bit_length_ >> 56);
-    blk_ += (bit_length_ >> 48);
-    blk_ += (bit_length_ >> 40);
-    blk_ += (bit_length_ >> 32);
-    blk_ += (bit_length_ >> 24);
-    blk_ += (bit_length_ >> 16);
-    blk_ += (bit_length_ >> 8);
-    blk_ += bit_length_;
+    for (int i = 0; i < 8; ++i) {
+      blk_ += (bit_length_ >> (56 - 8 * i));
+    }
 
     assert(blk_.size() == 64);
     transform();
@@ -376,6 +371,10 @@ public:
     for (int i = 0; i < 8; ++i)
       ss << std::setw(8) << std::setfill('0') << std::hex << hash_[i];
     return ss.str();
+  }
+
+  auto inline digest(const std::string &message) -> std::string {
+    return digest(BYTE_STRING(message.begin(), message.end()));
   }
 
 private:

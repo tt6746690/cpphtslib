@@ -19,8 +19,8 @@ public:
   GenericServer(const GenericServer &) = delete;
   GenericServer &operator=(const GenericServer &) = delete;
 
-  explicit GenericServer(const ServerAddr &server_address)
-      : server_address_(server_address), io_service_(), acceptor_(io_service_),
+  explicit GenericServer(const ServerAddr server_addr)
+      : server_address_(server_addr), io_service_(), acceptor_(io_service_),
         socket_(io_service_) {}
 
   /**
@@ -37,7 +37,7 @@ public:
   Router<Handler> router_;
 
 private:
-  const ServerAddr &server_address_;
+  ServerAddr server_address_;
   asio::io_service io_service_;
   asio::ip::tcp::acceptor acceptor_;
   asio::ip::tcp::socket socket_;

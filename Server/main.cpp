@@ -1,5 +1,6 @@
 #include "json.hpp"
 
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -9,12 +10,14 @@
 #define BOOST_ASIO_ENABLE_HANDLER_TRACKING // debugging
 // #define NDEBUG
 
+#include "Codec.h"
 #include "Response.h"
 #include "Server.h"
 #include "Uri.h"
 #include "Utilities.h"
 
 #include "Common.h"
+#include "Config.h"
 
 using namespace asio;
 using namespace Http;
@@ -24,7 +27,7 @@ using nlohmann::json;
 int main() {
 
   try {
-    io_service io;
+    auto config = ServerConfig();
     GenericServer::ServerAddr server_address =
         std::make_pair("127.0.0.1", 8888);
     auto app = std::make_unique<GenericServer>(server_address);
@@ -41,11 +44,11 @@ int main() {
 
     /*
         curl --http1.1 -v -X GET
-       '127.0.0.1:8888/reads/reads_id?format=BAM&referenceName=chr1&start=10145&end=10150&fields=QNAME,FLAG,POS'
+       '127.0.0.1:8888/reads/test?format=BAM&referenceName=chr1&start=10145&end=10150&fields=QNAME,FLAG,POS'
     */
     app->router_.get("/reads/");
     app->router_.get(
-        "/reads/<id>", Handler([](Context &ctx) {
+        "/reads/<id>", Handler([&](Context &ctx) {
 
           auto format = ctx.query_["format"];
           if (!format.empty() && format != "BAM" && format != "CRAM")
@@ -83,18 +86,41 @@ int main() {
           }
 
           /**
-           * Outputs requested bam to temporary file,
+           * -#   Outputs requested bam to temporary file,
+           * -#   Splits file into chunks
+           * -#   Returns a list of tickets, containing urls with byte range to
+           * temp file
            */
-          std::string command = "samtools view -bh ./data/test.bam " + // -b  -h
-                                referenceName + ":" + start + "-" + end;
+          std::string command = "samtools view -bh " +
+                                config.BAM_FILE_DIRECTORY + ctx.param_["id"] +
+                                ".bam " + referenceName + ":" + start + "-" +
+                                end;
 
-          Popen proc{command, "r"};
+          std::string bamslicename = SHA256Codec().digest(ctx.param_["id"]);
+
+          std::fstream bamslice;
+          bamslice.open(config.TEMP_FILE_DIRECTORY + bamslicename,
+                        std::ios::out);
+
           std::string result;
-          while (!(result = proc.read()).empty()) {
-            ctx.res_.write_text(result);
+          Popen proc_pipe{command, "r"};
+          while (!(result = proc_pipe.read()).empty()) {
+            bamslice << result;
           }
 
-          // ctx.res_.write_json(format_ticket(ctx));
+          std::vector<std::string> urls{
+              "127.0.0.1:8888/" + config.BAM_FILE_DIRECTORY + bamslicename,
+          };
+
+          json_type res = {
+              {"format", ctx.query_["format"]},
+              {"urls", urls},
+              {"md5", "md5_checksum_here"},
+          };
+
+          ctx.res_.content_type(
+              "application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
+          ctx.res_.write_json(res);
 
         }));
 
