@@ -45,29 +45,43 @@ TEST_CASE("base64 encoding/decoding", "[Codec]") {
   }
 }
 
-auto test_sha256(std::pair<std::string, > in_out) -> void {
+auto test_sha256(std::pair<std::string, std::string> in_out) -> void {
 
   auto in = std::get<0>(in_out);
   auto out = std::get<1>(in_out);
-
   auto message = BYTE_STRING(in.begin(), in.end());
-  auto output = BYTE_STRING(out.begin(), out.end());
 
-  SHA256Codec sha;
-  auto digest = sha.digest(message);
+  auto digest = SHA256Codec().digest(message);
 
-  std::cout << "message: " << message << std::endl;
-  std::cout << "correct out: " << output << std::endl;
-  std::cout << "digest: " << digest << std::endl;
+  // std::cout << "digest: " << digest << std::endl;
+  // std::cout << "correc: " << out << std::endl;
 
-  REQUIRE(digest == output);
+  REQUIRE(digest == out);
 }
 
 TEST_CASE("sha256 digest", "[Codec]") {
+
   SECTION("sha256 digest") {
-    test_sha256({"", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7"
-                     "852b855"});
-    test_sha256({"helloworld", "8cd07f3a5ff98f2a78cfc366c13fb123eb8d29c1ca3"
-                               "7c79df190425d5b9e424d"});
+    test_sha256(
+        {"1234567",
+         "8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414"});
+    test_sha256(
+        {"helloworld",
+         "936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af"});
+
+    test_sha256(
+        {"SHA-2 (Secure Hash Algorithm 2) is a set of cryptographic hash "
+         "functions designed by the United States National Security Agency "
+         "(NSA).[3] Cryptographic hash functions are mathematical operations "
+         "run on digital data; by comparing the computed hash (the output from "
+         "execution of the algorithm) to a known and expected hash value, a "
+         "person can determine the data's integrity. For example, computing "
+         "the hash of a downloaded file and comparing the result to a "
+         "previously published hash result can show whether the download has "
+         "been modified or tampered with.[4] A key aspect of cryptographic "
+         "hash functions is their collision resistance: nobody should be able "
+         "to find two different input values that result in the same hash "
+         "output.",
+         "cfcc61b181e8c87e765f8a17913258394088eab1976b110f9bf0bb5388e4304b"});
   }
 }

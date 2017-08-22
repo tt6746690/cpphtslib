@@ -15,20 +15,6 @@ namespace Http {
 using BYTE = uint8_t;
 using BYTE_STRING = std::basic_string<BYTE>;
 
-auto inline operator<<(std::ostream &strm, const BYTE_STRING in)
-    -> std::ostream & {
-  static int blkof4 = 0;
-  for (const auto c : in) {
-    strm << c - 0;
-    if (blkof4++ == 4) {
-      strm << " ";
-      blkof4 = 0;
-    }
-  }
-  blkof4 = 0;
-  return strm;
-}
-
 class Base64Codec {
 
 private:
@@ -176,6 +162,44 @@ public:
 using WORD = uint32_t;
 using WORD_STRING = std::basic_string<WORD>;
 
+/**
+ * @brief   Convert to/from hex string
+ */
+template <typename InputIter>
+auto to_hex_string(InputIter begin, InputIter end, bool insert_spaces = false)
+    -> std::string {
+  std::ostringstream ss;
+  ss << std::setfill('0') << std::hex;
+  while (begin != end) {
+    ss << std::setw(2) << static_cast<uint32_t>(*begin++);
+    if (insert_spaces && begin != end)
+      ss << " ";
+  }
+  return ss.str();
+}
+
+auto from_hex_string(std::string &hex_string) -> BYTE_STRING {
+
+  std::stringstream converter;
+  std::istringstream ss(hex_string);
+  BYTE_STRING byte_array;
+
+  std::string word;
+  while (ss >> word) {
+    BYTE temp;
+    converter << std::hex << word;
+    converter >> temp;
+    byte_array += temp;
+  }
+  return byte_array;
+}
+
+auto inline operator<<(std::ostream &strm, const BYTE_STRING in)
+    -> std::ostream & {
+  strm << to_hex_string(in.begin(), in.end());
+  return strm;
+}
+
 class SHA256Codec {
 
 private:
@@ -194,16 +218,16 @@ private:
     return (x & y) ^ (x & z) ^ (y & z);
   }
   // Hash functions
-  static constexpr WORD SIGMA0(WORD x) {
+  static constexpr WORD SIGUPP0(WORD x) {
     return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22);
   }
-  static constexpr WORD SIGMA1(WORD x) {
+  static constexpr WORD SIGUPP1(WORD x) {
     return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25);
   }
-  static constexpr WORD EPSILON0(WORD x) {
+  static constexpr WORD SIGLOW0(WORD x) {
     return ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3);
   }
-  static constexpr WORD EPSILON1(WORD x) {
+  static constexpr WORD SIGLOW1(WORD x) {
     return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
   }
   // first 32 bits of fractional parts of cube roots of first 64 prime numbers
@@ -235,7 +259,7 @@ private:
              (blk_[j + 3]);
     }
     for (int i = 16; i < 64; ++i) {
-      W[i] = SIGMA1(W[i - 2]) + W[i - 7] + SIGMA0(W[i - 15]) + W[i - 16];
+      W[i] = SIGLOW1(W[i - 2]) + W[i - 7] + SIGLOW0(W[i - 15]) + W[i - 16];
     }
 
     a = hash_[0];
@@ -248,8 +272,8 @@ private:
     h = hash_[7];
 
     for (int i = 0; i < 64; ++i) {
-      t1 = h + SIGMA1(e) + CH(e, f, g) + K[i] + W[i];
-      t2 = SIGMA0(a) + MAJ(a, b, c);
+      t1 = h + SIGUPP1(e) + CH(e, f, g) + K[i] + W[i];
+      t2 = SIGUPP0(a) + MAJ(a, b, c);
       h = g;
       g = f;
       f = e;
@@ -287,9 +311,6 @@ private:
       }
     }
     bit_length_ += blk_.size() * 8;
-
-    std::cout << "after update, blk_=" << blk_ << " bitlength=" << bit_length_
-              << std::endl;
   }
 
   /**
@@ -314,19 +335,15 @@ private:
     }
     assert(blk_.size() == 56);
 
-    std::cout << "[" << blk_ << "]" << std::endl;
-
     // last 8 bytes of blk_ holds message length in bits
-    blk_ += bit_length_ & 0xff;
-    blk_ += (bit_length_ >> 8) & 0xff;
-    blk_ += (bit_length_ >> 16) & 0xff;
-    blk_ += (bit_length_ >> 24) & 0xff;
-    blk_ += (bit_length_ >> 32) & 0xff;
-    blk_ += (bit_length_ >> 40) & 0xff;
-    blk_ += (bit_length_ >> 48) & 0xff;
-    blk_ += (bit_length_ >> 56) & 0xff;
-
-    std::cout << "[" << blk_ << "]" << std::endl;
+    blk_ += (bit_length_ >> 56);
+    blk_ += (bit_length_ >> 48);
+    blk_ += (bit_length_ >> 40);
+    blk_ += (bit_length_ >> 32);
+    blk_ += (bit_length_ >> 24);
+    blk_ += (bit_length_ >> 16);
+    blk_ += (bit_length_ >> 8);
+    blk_ += bit_length_;
 
     assert(blk_.size() == 64);
     transform();
@@ -336,41 +353,29 @@ private:
    * @brief   Prints current hash value
    */
   inline void print_hash(std::string msg) {
+    std::ios::fmtflags f(std::cout.flags());
     std::cout << msg << ": ";
-    for (int i = 0; i < 7; ++i) {
-      std::cout << std::hex << hash_[i] << " ";
+    for (int i = 0; i < 8; ++i) {
+      std::cout << std::setw(8) << std::setfill('0') << std::hex << hash_[i]
+                << " ";
     }
     std::cout << std::endl;
+    std::cout.flags(f);
   }
 
 public:
   /**
-   * @brief   Generate digests
+   * @brief   Generate digests, in hexidecimal string
    */
-  auto inline digest(const BYTE_STRING &M) -> BYTE_STRING {
+  auto inline digest(const BYTE_STRING &message) -> std::string {
 
-    print_hash("init: ");
-
-    update(M);
-    print_hash("after update");
-
+    update(message);
     pad();
-    print_hash("after pad");
 
-    std::vector<BYTE> hash(32);
-
-    for (int i = 0; i < 7; ++i) {
-      hash[i] = (hash_[0] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 4] = (hash_[1] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 8] = (hash_[2] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 12] = (hash_[3] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 16] = (hash_[4] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 20] = (hash_[5] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 24] = (hash_[6] >> (24 - i * 8)) & 0x000000ff;
-      hash[i + 28] = (hash_[7] >> (24 - i * 8)) & 0x000000ff;
-    }
-
-    return BYTE_STRING(hash.begin(), hash.end());
+    std::ostringstream ss;
+    for (int i = 0; i < 8; ++i)
+      ss << std::setw(8) << std::setfill('0') << std::hex << hash_[i];
+    return ss.str();
   }
 
 private:
