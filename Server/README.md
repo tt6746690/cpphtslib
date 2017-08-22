@@ -1,35 +1,5 @@
 
-
-
-
-
-### Handle large file transfer over net 
-
-
-+ html5 file api 
-+ `resumable.js`
-    + fault tolerant, concurrent, resumable updates with html5 File API
-        + upload in chunks
-        + re-try if any chunk transfer fails...
-
-
-### Questions 
-
-
-+ _Htsget_ 
-    + serving 
-        + _byte serving_ 
-        + _chunked encoding_ 
-    + `urls`
-        + how to logically divide up the requested region into `urls`
-        + how large are each payload
-    + _routing specifics_
-        + does server generates routes dyamically on the fly on request
-            + i.e. on receiving request, new routes created, which points to a range (in bytes) of data of a specific bam?
-    + _binary or text data_
-        + for now just sending output of `samtools view`
-        + is there a way to convert from human-readable `samtools view` to a valid `.bam` file
-
+# Server impl of Htsget
 
 ### Resources
 
@@ -39,22 +9,18 @@
 
 + _a data retrieval API for client/server model_
     - [ ] Support BAM/CRAM data formats
-    - [ ] Access to subsets of genomic data (for browsing specific region) to full genomes (calling variants)
-    - [ ] Client provide hints of info to be received, server respond with more info but not less
-    - [ ] Follow pan-GA4GH standards,
-        - [ ] POST, redirects, and non-reads data will follow protobuf3 compatible JSON
+    - [x] Access to subsets of genomic data (for browsing specific region) to full genomes (calling variants)
+    - [x] Client provide hints of info to be received, server respond with more info but not less
 + _essentials_ 
     - [x] API makes to HTTP(S) endpoints, receive URL-encoded query string param, return JSON outputs
         - [x] HTTP status 200 for success 
         - [x] UTF8-encoded JSON in response body, with `application/json` content-type
         - [ ] Server implements chunked transfer encoding 
         - [ ] client/server negotiate HTTP/2 upgrade 
-    - [x] timestamp in response in [ISO 8061](https://www.iso.org/iso-8601-date-and-time-format.html) format (with `<ctime>`)
-    - [ ] HTTP response compressed with [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html) `transfer-encoding` 
 + _Autentication_ 
     - [ ] Requests authenticated with OAuth2 bearer token, with [RFC 6750](https://tools.ietf.org/html/rfc6750)
         - [ ] client supplies header `Authorization: Bearer xxxx` with each HTTPS request
-    - [ ] or just allow non-authenticated requests 
+    - [x] or just allow non-authenticated requests 
 + _Errors_
     - [x] Appropriate HTTP code return on error condition 
     - [ ] in case of transient server error (503, other 5xx) client should implement retry logic 
@@ -64,19 +30,19 @@
     - [ ] A request with `Origin` header will be propagated to `Access-Control-Allow-Origin` header of response
 + _Methods_
     - [x] `GET /reads/<id>`, 
-        - [ ] response with json containing a `ticket` allowing caller to obtain data in specified format
+        - [x] response with json containing a `ticket` allowing caller to obtain data in specified format
         - [ ] Client may need to filter out extraneous records, i.e. want reads overlapping a region but may include reads not overlapping 
-        - [ ] Successful request with empty result set still produce valid response in requested format (header + EOF)
-        - [ ] `<id>` a string specifying which reads to return, corresponds to `ReadGroupSetIds` in GA4GH API
-    - [ ] query parameters implementation
-        + `format`: `BAM` or `CRAM`
-        + `referenceName`: ref sequence name, i.e. `chr1` 
-        + `start`: `uint32_t`, `InvalidInput` if `start` specified and a reference is not, `InvalidRange` if `start > end`
-        + `end`: `uint32_t`, `InvalidInput` if `end` specified and a reference is not, `InvalidRange` if `start > end`
-        + `fields`: list of fields to include in response (i.e. `fields=QNAME, FLAG, POS` for BAM)
-        + `tags`: comma separated list of tags to include, 
-        + `notags`
-    - [ ] response JSON
+        - [x] Successful request with empty result set still produce valid response in requested format (header + EOF)
+        - [x] `<id>` a string specifying which reads to return, corresponds to `ReadGroupSetIds` in GA4GH API
+    - [x] query parameters implementation
+        - [x]  `format`: `BAM` or `CRAM`
+        - [x] `referenceName`: ref sequence name, i.e. `chr1` 
+        - [x] `start`: `uint32_t`, `InvalidInput` if `start` specified and a reference is not, `InvalidRange` if `start > end`
+        - [x] `end`: `uint32_t`, `InvalidInput` if `end` specified and a reference is not, `InvalidRange` if `start > end`
+        - [ ] `fields`: list of fields to include in response (i.e. `fields=QNAME, FLAG, POS` for BAM)
+        - [ ] `tags`: comma separated list of tags to include, 
+        - [ ] `notags`
+    - [x] response JSON
         ```js 
         {
             format: "BAM", 
@@ -90,20 +56,20 @@
         }
         ```
     - [ ] HTTPS data block urls 
-        - [ ] percent-encoded path and query, url format [specification](http://www.ietf.org/rfc/rfc2396.txt)
-        - [ ] accepts `GET` request 
+        - [x] percent-encoded path and query, url format [specification](http://www.ietf.org/rfc/rfc2396.txt)
+        - [x] accepts `GET` request 
         - [ ] provide CORS
         - [ ] provide multiple request retries, within reason 
         - [ ] use HTTPS 
         - [ ] Server supply response with `Content-Length` header, chunked transfer encoding, or both. Client should detect response truncation 
         - [ ] client and url endpoint should negotiate HTTP/2 upgrade 
         - [ ] client follow 3xx redirects from URL, 
-    - [ ] Inline data block uris
-        - [ ] i.e. `data:application/vnd.ga4gh.bam;base64,...` [RFC2397](https://www.ietf.org/rfc/rfc2397.txt)` [data scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)
-        - [ ] must use `base64` encoding 
-        - [ ] should ignore media type, 
+    - [x] Inline data block uris
+        - [x] i.e. `data:application/vnd.ga4gh.bam;base64,...` [RFC2397](https://www.ietf.org/rfc/rfc2397.txt)` [data scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)
+        - [x] must use `base64` encoding 
+        - [x] should ignore media type, 
 + _Reliability & performance_
-    - [ ] server should divide large payloads to multiple data blocks in `urls` array 
+    - [x] server should divide large payloads to multiple data blocks in `urls` array 
     - [ ] client fetch in parallel `urls`
     - [ ] data blocks <= 1GB 
     - [ ] inline data blocks <= few MB

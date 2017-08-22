@@ -104,7 +104,8 @@ int main() {
 
           std::fstream bamslice;
           std::string f_relpath = config.TEMP_FILE_DIRECTORY + bamslicename;
-          std::string url_abspath = "http://127.0.0.1:8888/" + f_relpath;
+          std::string url_abspath = "http://127.0.0.1:8888/" + f_relpath;   // Uri::urlencode(f_relpath) later
+
           bamslice.open(f_relpath, std::ios::out);
 
           std::string result;
@@ -124,18 +125,20 @@ int main() {
           ticket.checksum(checksum.get_hash());
 
           std::cout << std::setw(4) << ticket.to_json() << std::endl;
+          
 
           ctx.res_.content_type(
               "application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
           ctx.res_.write_json(ticket.to_json());
+          std::cout << ctx.res_ << std::endl;
 
         }));
 
     /*
         curl --http1.1 -v -X GET -H "Range: bytes=0-100" '127.0.0.1:8888/data/9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
     */
-    app->router_.get("/temp/");
-    app->router_.get("/temp/<filename>", Handler([&](Context &ctx) {
+    app->router_.get("/data/");
+    app->router_.get("/data/<filename>", Handler([&](Context &ctx) {
                        std::string range;
                        bool range_exists;
                        std::tie(range, range_exists) =

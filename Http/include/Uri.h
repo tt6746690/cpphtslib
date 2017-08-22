@@ -47,13 +47,13 @@ public:
    *  --  convert each char (ASCII or non-ASCII) to utf-8
    *  --  Represenet byte value with hex digits, preceded by %
    */
-  auto static urlencode(std::string &url) -> std::string;
+  auto static urlencode(const std::string &url) -> std::string;
   /**
    * @brief   decode url
    *
    * @precond assumes url consists of uri allowed charset
    */
-  auto static urldecode(std::string &url) -> std::string;
+  auto static urldecode(const std::string &url) -> std::string;
 
   /**
    * @brief   Convert a query string to a map of key-value pairs

@@ -1,5 +1,9 @@
 
 
+### Summary
+
+A server/client implementation of htsget [protocol](http://samtools.github.io/hts-specs/htsget.html). 
+
 
 #### Compilation
 

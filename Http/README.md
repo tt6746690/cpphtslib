@@ -1,5 +1,25 @@
 
 
+### a simple `Http` library
+
++ Partial implementation (as much as needed) of HTTP/1.1
+    + Request parsing and response writing
+    + Uri percent encoding/decoding
++ Compact-trie based router to handle 
+    + request-response cycle 
+    + middleware stuff
+
+### Todos
+
+- [ ] Multithreaded support 
+- [ ] async file serving 
+- [ ] add openSSL
+- [ ] some useful middlewares
+    - [ ] body parser
+    - [ ] CORS
+
+
+
 ### Resources
 
 + configure include path for `c_cpp_properties.json` with `gcc -xc++ -E -v -`

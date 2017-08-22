@@ -21,7 +21,7 @@ auto Uri::decode() -> void {
   fragment_ = urldecode(fragment_);
 }
 
-auto Uri::urlencode(std::string &url) -> std::string {
+auto Uri::urlencode(const std::string &url) -> std::string {
   if (url.empty())
     return {};
 
@@ -35,7 +35,7 @@ auto Uri::urlencode(std::string &url) -> std::string {
   return encoded;
 }
 
-auto Uri::urldecode(std::string &url) -> std::string {
+auto Uri::urldecode(const std::string &url) -> std::string {
   if (url.empty())
     return {};
 
