@@ -10,13 +10,17 @@
 #define BOOST_ASIO_ENABLE_HANDLER_TRACKING // debugging
 // #define NDEBUG
 
+// Http::
 #include "Codec.h"
 #include "Response.h"
 #include "Server.h"
 #include "Uri.h"
 #include "Utilities.h"
 
-#include "Common.h"
+// HtsgetServer::
+#include "Wrapper.h"
+#include "Ticket.h"
+#include "Error.h"
 #include "Config.h"
 
 using namespace asio;
@@ -99,37 +103,32 @@ int main() {
           std::string bamslicename = SHA256Codec().digest(ctx.param_["id"]);
 
           std::fstream bamslice;
-          bamslice.open(config.TEMP_FILE_DIRECTORY + bamslicename,
-                        std::ios::out);
+          std::string f_relpath = config.TEMP_FILE_DIRECTORY + bamslicename;
+          std::string url_abspath = "127.0.0.1:8888/" + f_relpath;
+          bamslice.open(f_relpath, std::ios::out);
 
           std::string result;
           Popen proc_pipe{command, "r"};
+
+          Ticket ticket("bam");
+          int bamslice_size = 0;
           while (!(result = proc_pipe.read()).empty()) {
             bamslice << result;
+            ticket.add_url({url_abspath, {{"Range", "bytes=" + std::to_string(bamslice_size) + "-" + std::to_string(bamslice_size + result.size())}, {"Bearer", "xxx"}} });
+            bamslice_size += result.size();
           }
-
-          std::vector<std::string> urls{
-              "127.0.0.1:8888/" + config.BAM_FILE_DIRECTORY + bamslicename,
-          };
-
-          json_type res = {
-              {"format", ctx.query_["format"]},
-              {"urls", urls},
-              {"md5", "md5_checksum_here"},
-          };
 
           ctx.res_.content_type(
               "application/vnd.ga4gh.htsget.v0.2rc+json; charset=utf-8");
-          ctx.res_.write_json(res);
+          ctx.res_.write_json(ticket.to_json());
 
         }));
 
     /*
-        curl --http1.1 -v -X GET -H "Range: bytes=65536-1003750"
-       '127.0.0.1:8888/data/test.bam'
+        curl --http1.1 -v -X GET -H "Range: bytes=0-100" '127.0.0.1:8888/data/9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
     */
     app->router_.get("/data/");
-    app->router_.get("/data/<filename>", Handler([](Context &ctx) {
+    app->router_.get("/data/<filename>", Handler([&](Context &ctx) {
                        std::string range;
                        bool range_exists;
                        std::tie(range, range_exists) =
@@ -142,12 +141,34 @@ int main() {
                          range = range.substr(range.find('=') + 1);
                          start = std::stoi(range.substr(0, range.find('-')));
                          end = std::stoi(range.substr(range.find('-') + 1));
+                       } else {
+                         return send_error(ctx, ResErrorType::InvalidInput, 
+                                          "Request Parameter: need to specify byte ranges");
                        }
 
-                       ctx.res_.write_range("./data/" + ctx.param_["filename"] +
-                                                std::to_string(start) + "-" +
-                                                std::to_string(end),
-                                            range, "1000000");
+                       if (start > end)
+                        return send_error(ctx, ResErrorType::InvalidRange,
+                                          "Request parameter: start is greater than end");
+
+                       std::string infp = config.TEMP_FILE_DIRECTORY + ctx.param_["filename"].c_str();
+                       std::ifstream is(infp, std::ifstream::in);
+                       if(!is)
+                          return send_error(ctx, ResErrorType::NotFound,
+                                          "Requested file " + infp + " not found");
+                        
+                      is.seekg (0, is.end);
+                      int bamslice_size = is.tellg();
+                      is.seekg(start, is.beg);
+
+                      if(start > bamslice_size || end > bamslice_size)
+                        return send_error(ctx, ResErrorType::InvalidRange,
+                                    "Request parameter: start/end is greater than size of file");
+
+                      char * buffer = new char[end-start];
+                      is.read(buffer, end-start);
+                      ctx.res_.write_range(buffer, start, end, bamslice_size);
+
+                      delete[] buffer;
                      }));
 
     std::cout << app->router_ << std::endl;

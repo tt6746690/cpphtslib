@@ -61,13 +61,13 @@ auto Response::write_text(std::string data) -> void {
   body_ += data;
 }
 
-auto Response::write_range(std::string data, std::string range,
-                           std::string total) -> void {
-  set_header({"Content-Range", "bytes " + range + "/" + total});
-  content_length(content_length() + data.size());
+auto Response::write_range(char* data, int start, int end, int total)
+      -> void{
+  set_header({"Content-Range", "bytes " + std::to_string(start) + "-" + std::to_string(end) + "/" + std::to_string(total)});
+  content_length(content_length() + end - start);
   status_code_ = StatusCode::Partial_Content;
 
-  body_ += data;
+  body_ += std::string(data, end-start);
 }
 
 auto Response::write_json(json_type data) -> void {

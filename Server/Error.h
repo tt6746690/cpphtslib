@@ -1,14 +1,3 @@
-/*
-InvalidAuthentication	401	Authorization provided is invalid
-PermissionDenied	403	Authorization is required to access the resource
-NotFound	404	The resource requested was not found
-UnsupportedFormat	400	The requested file format is not supported
-by the server
-InvalidInput	400	The request parameters do not adhere to the
-specification
-InvalidRange	400	The requested range cannot be satisfied
-*/
-
 #ifndef COMMON_H
 #define COMMON_H
 
@@ -16,8 +5,6 @@ InvalidRange	400	The requested range cannot be satisfied
 #include "Utilities.h"
 #include "json.hpp"
 
-#include <cstdio>
-#include <cstdlib>
 #include <iostream>
 
 using namespace Http;
@@ -65,36 +52,6 @@ auto send_error(Context &ctx, ResErrorType error, std::string message) -> void {
   ctx.res_.status_code(status_code);
 }
 
-
-
-class Popen {
-
-public:
-  explicit Popen(const char *command, const char *mode) {
-    fp_ = popen(command, mode);
-  }
-  explicit Popen(const std::string &command, const char *mode) {
-    fp_ = popen(command.c_str(), mode);
-  }
-  ~Popen() {
-    if (pclose(fp_)) { // returns child PID if processs stopped/terminated
-      std::cout << "pclose: fp not closed properly" << std::endl;
-      exit(1);
-    }
-  }
-
-public:
-  auto read() -> std::string {
-    bytes_read_ = std::fread(buf_, 1, BUF_SIZE, fp_);
-    return std::string(buf_, buf_ + bytes_read_);
-  }
-
-private:
-  constexpr static int BUF_SIZE = 1024;
-  int bytes_read_;
-  unsigned char buf_[BUF_SIZE];
-  FILE *fp_;
-};
 }
 
 #endif
