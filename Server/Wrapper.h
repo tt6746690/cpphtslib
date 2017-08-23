@@ -1,4 +1,4 @@
-#ifndef WRAPPER_H 
+#ifndef WRAPPER_H
 #define WRAPPER_H
 
 #include <cstdio>
@@ -31,14 +31,11 @@ public:
   }
 
 private:
-  static constexpr int BUF_SIZE = 1000;
+  static constexpr int BUF_SIZE = 1024 * 1024;
   int bytes_read_;
   unsigned char buf_[BUF_SIZE];
   FILE *fp_;
 };
-
-
 }
-
 
 #endif

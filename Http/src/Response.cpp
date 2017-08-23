@@ -71,7 +71,7 @@ auto Response::write_range(char* data, int start, int end, int total)
 }
 
 auto Response::write_json(json_type data) -> void {
-  std::string dump = data.dump(4);
+  std::string dump = data.dump();
 
   content_type("application/json");
   content_length(content_length() + dump.size());

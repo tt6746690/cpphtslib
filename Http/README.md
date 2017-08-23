@@ -11,9 +11,10 @@
 
 ### Todos
 
+- [ ] chunked transfer encoding
 - [ ] Multithreaded support 
 - [ ] async file serving 
-- [ ] add openSSL
+- [ ] HTTPS using openSSL
 - [ ] some useful middlewares
     - [ ] body parser
     - [ ] CORS
@@ -28,4 +29,5 @@
 + [HTTP/1.1 standard](https://www.w3.org/Protocols/rfc2616/rfc2616.html)
 + explanation on [`std::streambuf`](http://en.cppreference.com/w/cpp/io/basic_streambuf)
 + [go.http](https://golang.org/pkg/net/http/)
++ [mozilla doc on HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/)
 

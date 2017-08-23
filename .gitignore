@@ -5,6 +5,7 @@ build/
 bin/
 lib/
 data/
+plugin/
 
 learn/code
 
