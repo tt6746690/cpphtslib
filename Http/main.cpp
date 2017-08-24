@@ -27,8 +27,8 @@ int main()
     try
     {
         io_service io;
-        GenericServer::ServerAddr server_address = std::make_pair("127.0.0.1", 8888);
-        auto app = std::make_unique<GenericServer>(server_address);
+        HttpsServer::ServerAddr server_address = std::make_pair("127.0.0.1", 8888);
+        auto app = std::make_unique<HttpsServer>(server_address);
 
         /* url query middleware */
         app->router_.get("/",

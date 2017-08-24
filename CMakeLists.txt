@@ -5,7 +5,8 @@ project(Htsget)
 # compiler
 set(CMAKE_CXX_COMPILER_ID "Clang")
 # set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm@4/bin/clang-4.0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -stdlib=libc++ -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -stdlib=libc++ -Wall -I/usr/local/opt/openssl/include")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/opt/openssl/lib")
 
 # generic path 
 set(CMAKE_BINARY_DIR ${PROJECT_SOURCE_DIR}/bin)      

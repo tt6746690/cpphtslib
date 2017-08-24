@@ -4,9 +4,12 @@ project(Http)
 # cmake --build build -- -j3
 # ./bin/server
 
+find_package(openssl REQUIRED)
+
 # include directory and set up lib dependencies
 include_directories(include)
 include_directories(SYSTEM ${HEADER_ONLY_INCLUDE})
+
 
 # server
 set(SOURCE_FILES 
@@ -29,6 +32,8 @@ set(SOURCE_FILES
     src/Response.cpp
     src/Uri.cpp
 )
+
+
 
 add_executable(server main.cpp ${SOURCE_FILES})
 add_library(Http ${SOURCE_FILES})
