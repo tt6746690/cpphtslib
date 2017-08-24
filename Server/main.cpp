@@ -41,9 +41,9 @@ int main() {
 
   try {
     auto config = ServerConfig();
-    GenericServer::ServerAddr server_address =
+    ServerAddr server_address =
         std::make_pair("127.0.0.1", 8888);
-    auto app = std::make_unique<GenericServer>(server_address);
+    auto app = std::make_unique<HttpServer>(server_address);
 
     /* Cors middleware */
     // app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); //

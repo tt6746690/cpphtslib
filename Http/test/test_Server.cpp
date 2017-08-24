@@ -13,8 +13,8 @@ TEST_CASE("Construct routes", "[Server]")
 {
 
     io_service io;
-    GenericServer::ServerAddr server_address = make_pair("127.0.0.1", 8888);
-    auto app = make_unique<GenericServer>(server_address);
+    ServerAddr server_address = make_pair("127.0.0.1", 8888);
+    auto app = make_unique<HttpServer>(server_address);
 
     SECTION("serverroute")
     {

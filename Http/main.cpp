@@ -27,9 +27,9 @@ int main() {
 
   try {
     io_service io;
-    GenericServer::ServerAddr server_address =
+    ServerAddr server_address =
         std::make_pair("127.0.0.1", 8888);
-    auto app = std::make_unique<GenericServer>(server_address);
+    auto app = std::make_unique<HttpServer>(server_address);
 
     /*  Cors middleware on all routes
 
@@ -41,7 +41,7 @@ int main() {
     curl --http1.1 -v -X OPTIONS -H "Origin: localhost" -H
     "Access-Control-Request-Method: GET" '127.0.0.1:8888/'
     */
-    app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000));
+    // app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000));
 
     /* url query middleware */
     app->router_.get("/r", Handler([](Context &ctx) {
@@ -56,7 +56,7 @@ int main() {
 
     std::cout << app->router_ << std::endl;
     app->run();
-  } catch (std::exception e) {
+  } catch (const std::exception e) {
     std::cerr << e.what() << std::endl;
   }
 
