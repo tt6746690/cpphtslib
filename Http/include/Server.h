@@ -22,9 +22,6 @@
 namespace Http {
 
 using ServerAddr = std::pair<std::string, int>;
-using tcp_socket = asio::ip::tcp::socket;
-using ssl_socket = asio::ssl::stream<asio::ip::tcp::socket>;
-
 
 /**
  * @brief   A generic Http server
@@ -71,8 +68,9 @@ public:
     [=](std::error_code ec) {
       if (!ec) {
         auto new_connection =
-            std::make_shared<Connection>(std::move(
-              static_cast<Derived*>(this)->socket_move()), router_);
+            std::make_shared<
+              Connection<decltype(static_cast<Derived*>(this)->socket_)>>
+              (std::move(static_cast<Derived*>(this)->socket_move()), router_);
         new_connection->start();
       }
       accept_connection();
@@ -106,15 +104,15 @@ public:
     : GenericServer(server_addr),
       socket_(io_service_) {};
 
-  auto inline socket() -> tcp_socket& {
+  auto inline socket() -> TcpSocket& {
     return socket_;
   }
-  auto inline socket_move() -> tcp_socket&& {
+  auto inline socket_move() -> TcpSocket&& {
     return std::move(socket_);
   }
 
-private:
-  tcp_socket socket_;
+public:
+  TcpSocket socket_;
 };
 
 /**
@@ -130,18 +128,18 @@ public:
         configure_ssl_context(); 
       };
     
-  auto inline socket() -> ssl_socket&{
-    return socket_;
+  auto inline socket() -> SslSocket::lowest_layer_type&{
+    return socket_.lowest_layer();
   }
-  auto inline socket_move() -> ssl_socket&& {
+  auto inline socket_move() -> SslSocket&& {
     return std::move(socket_);
   }
 private:
   void configure_ssl_context();
 
-private:
+public:
   asio::ssl::context context_;    
-  ssl_socket socket_;
+  SslSocket socket_;
 };
 }
 
