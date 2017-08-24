@@ -30,4 +30,5 @@
 + explanation on [`std::streambuf`](http://en.cppreference.com/w/cpp/io/basic_streambuf)
 + [go.http](https://golang.org/pkg/net/http/)
 + [mozilla doc on HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/)
++ [sprint.io on CORS](https://spring.io/understanding/CORS)
 

@@ -7,7 +7,7 @@
 #include "asio.hpp"
 #endif
 
-#include "asio/ssl.hpp"
+// #include "asio/ssl.hpp"
 
 #include "Router.h"
 
@@ -22,7 +22,8 @@ public:
   GenericServer &operator=(const GenericServer &) = delete;
 
   explicit GenericServer(const ServerAddr server_addr)
-      : server_address_(server_addr), io_service_(), acceptor_(io_service_), socket_(io_service_){};
+      : server_address_(server_addr), io_service_(), acceptor_(io_service_),
+        socket_(io_service_){};
 
   /**
    * @brief   Starts the server
@@ -34,37 +35,33 @@ public:
   std::string host() const;
   int port() const;
 
-
 public:
   Router<Handler> router_;
 
 private:
-  ServerAddr server_address_;   // (host, port) pair
-  asio::io_service io_service_;   
-  asio::ip::tcp::acceptor acceptor_;    // tcp acceptor
+  ServerAddr server_address_; // (host, port) pair
+  asio::io_service io_service_;
+  asio::ip::tcp::acceptor acceptor_; // tcp acceptor
   asio::ip::tcp::socket socket_;
-  
+
   // configs
   constexpr static int max_header_bytes = 1 << 20; // 1MB
 
   void accept_connection();
 };
 
-class HttpsServer: public GenericServer {
-public:
-  HttpsServer(const ServerAddr server_addr)
-    : GenericServer(server_addr), context_(asio::ssl::context::sslv23){
-      configure_ssl_context();
-    }
-private:
-  void configure_ssl_context();
+// class HttpsServer: public GenericServer {
+// public:
+//   HttpsServer(const ServerAddr server_addr)
+//     : GenericServer(server_addr), context_(asio::ssl::context::sslv23){
+//       configure_ssl_context();
+//     }
+// private:
+//   void configure_ssl_context();
 
-private:
-  asio::ssl::context context_;    // ssl
-};
-
-
-
+// private:
+//   asio::ssl::context context_;    // ssl
+// };
 }
 
 #endif

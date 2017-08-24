@@ -26,33 +26,67 @@ struct Context {
       : req_(req), res_(res), param_(req.param_), query_(req.query_){};
 };
 
-static int handler_count = 0;
+/**
+ * @brief   Defines rules for giving handler unique ids
+ *          template arguments to Handler during instantiation
+ */
+class HandlerCounter {
+private:
+  int handler_count_;
 
-class Handler {
+public:
+  HandlerCounter(int start_from = 1) : handler_count_(start_from){};
+  int operator()() { return handler_count_++; }
+};
+
+/**
+ * @brief   global counter as default Counter to Handler_
+ */
+static auto global_handler_counter = HandlerCounter();
+
+/**
+ * @brief   A Wrapper around a Callable,
+ */
+template <typename Counter = HandlerCounter> class Handler_ {
 public:
   using HandlerFunc = std::function<void(Context &)>;
 
-  explicit Handler() : handler_(nullptr){};
-  explicit Handler(HandlerFunc handler)
-      : handler_(handler), handler_id_(handler_count) {
-    ++handler_count;
-  };
+  explicit Handler_() : handler_(nullptr), handler_id_(0){};
+  explicit Handler_(HandlerFunc handler,
+                    Counter count_up = global_handler_counter)
+      : handler_(handler), handler_id_(count_up()){};
 
   operator bool() const { return handler_ != nullptr; }
   void operator()(Context &ctx) { handler_(ctx); }
-  bool operator==(const Handler &rhs) { return handler_id_ == rhs.handler_id_; }
-  bool operator!=(const Handler &rhs) { return !(operator==(rhs)); }
+  bool operator==(const Handler_<> &rhs) {
+    return handler_id_ == rhs.handler_id_;
+  }
+  bool operator!=(const Handler_<> &rhs) { return !(operator==(rhs)); }
 
+  void handle(HandlerFunc handle, Counter count_up = global_handler_counter) {
+    handler_ = handle;
+    if (!handler_id_)
+      handler_id_ = count_up();
+  }
+
+public:
   HandlerFunc handler_;
   int handler_id_;
 
 public:
-  friend auto inline operator<<(std::ostream &strm, Handler &handler)
+  friend auto inline operator<<(std::ostream &strm, Handler_<> &handler)
       -> std::ostream & {
     return strm << "(" << handler.handler_id_ << ")";
   }
 };
 
+// use default template specialization
+using Handler = Handler_<>;
+
+/**
+ * @brief   A class for constructing routes at compile-time, and
+ *          resolving request to a sequence of handlers at run-time
+ */
 template <typename T> class Router {
 public:
   explicit Router() : routes_(method_count){};

@@ -4,6 +4,7 @@
 #include <utility>  // enable_shared_from_this, move
 
 #include "Connection.h"
+#include "Uri.h"
 #include "Constants.h"
 
 using namespace std;
@@ -50,11 +51,14 @@ void Connection::read_payload() {
                          response_.status_code(StatusCode::OK);
                          response_.version_major_ = request_.version_major_;
                          response_.version_minor_ = request_.version_minor_;
+                         request_.query_ = Uri::make_query(request_.uri_.query_);
 
                          auto handlers = router_.resolve(request_);
                          for (auto &handler : handlers) {
                            handler(context_);
                          }
+
+                         std::cout << response_ << std::endl;
 
                          write_payload();
                          break;

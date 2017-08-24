@@ -12,6 +12,18 @@
 
 namespace Http {
 
+
+template<typename InputIter>
+auto concat(InputIter begin, InputIter end) -> std::string{
+  std::string s;
+  std::for_each(begin, end, [&s](auto e){
+    s += e + ", ";
+  });
+  if(!s.empty())
+    s.erase(s.end() - 2, s.end());
+  return s;
+}
+
 static inline auto split(std::string s, char delim)
     -> std::pair<std::string, std::string> {
   auto pos = s.find(delim);

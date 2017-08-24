@@ -25,6 +25,34 @@ public:
   constexpr static const char *request_method_to_string(RequestMethod method) {
     return enum_map(request_methods, method);
   };
+  constexpr static RequestMethod string_to_request_method(std::string& method){
+    switch(method.front()){
+      case 'G':
+        return static_cast<RequestMethod>(0);
+      case 'H':
+        return static_cast<RequestMethod>(1);
+      case 'P':{
+        switch(method[1]){
+          case 'O':
+            return static_cast<RequestMethod>(2);
+          case 'U':
+            return static_cast<RequestMethod>(3);
+          case 'A':
+            return static_cast<RequestMethod>(4);
+        }
+      }
+      case 'D':
+        return static_cast<RequestMethod>(5);
+      case 'C':
+        return static_cast<RequestMethod>(6);
+      case 'O':
+        return static_cast<RequestMethod>(7);
+      case 'T':
+        return static_cast<RequestMethod>(8);
+      default:
+        return static_cast<RequestMethod>(9);
+    }
+  }
 
   friend auto inline operator<<(std::ostream &strm, const Request &request)
       -> std::ostream & {
