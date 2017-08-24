@@ -29,7 +29,6 @@ public:
         {"htsget",
          {{"format", format_}, {"urls", urls}, {"sha256", checksum_}}}};
 
-    // json_type j = {{"format", format_}, {"urls", urls}, {"md5", checksum_}};
     return j;
   }
 

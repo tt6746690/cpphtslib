@@ -1,13 +1,18 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-/* Enforce C++11 support */
-#ifndef ASIO_STANDALONE
-#define ASIO_STANDALONE
-#include "asio.hpp"
-#endif
+#define ASIO_SEPARATE_COMPILATION
 
-// #include "asio/ssl.hpp"
+#define ASIO_STANDALONE
+
+#undef ASIO_HEADER_ONLY
+
+#include "asio.hpp"
+#include "asio/impl/src.hpp"
+#include "asio/ssl/impl/src.hpp"
+
+
+#include "asio/ssl.hpp"
 
 #include "Router.h"
 
@@ -50,18 +55,18 @@ private:
   void accept_connection();
 };
 
-// class HttpsServer: public GenericServer {
-// public:
-//   HttpsServer(const ServerAddr server_addr)
-//     : GenericServer(server_addr), context_(asio::ssl::context::sslv23){
-//       configure_ssl_context();
-//     }
-// private:
-//   void configure_ssl_context();
+class HttpsServer: public GenericServer {
+public:
+  HttpsServer(const ServerAddr server_addr)
+    : GenericServer(server_addr), context_(asio::ssl::context::sslv23){
+      configure_ssl_context();
+    }
+private:
+  void configure_ssl_context();
 
-// private:
-//   asio::ssl::context context_;    // ssl
-// };
+private:
+  asio::ssl::context context_;    // ssl
+};
 }
 
 #endif

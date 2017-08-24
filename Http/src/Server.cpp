@@ -3,6 +3,8 @@
 #include <memory>  // smart pointers
 #include <utility> // make_pair
 
+#include "asio.hpp"
+
 #include "Connection.h"
 #include "Server.h"
 
@@ -40,22 +42,21 @@ std::string GenericServer::host() const {
 
 int GenericServer::port() const { return std::get<int>(server_address_); }
 
-// void HttpsServer::configure_ssl_context() {
-//   context_.set_options(asio::ssl::context::default_workarounds |
-//                        asio::ssl::context::no_sslv2 |
-//                        asio::ssl::context::single_dh_use);
+void HttpsServer::configure_ssl_context() {
+  context_.set_options(asio::ssl::context::default_workarounds |
+                       asio::ssl::context::no_sslv2 |
+                       asio::ssl::context::single_dh_use);
 
-//   //
-//   https://stackoverflow.com/questions/6452756/exception-running-boost-asio-ssl-example
+  // https://stackoverflow.com/questions/6452756/exception-running-boost-asio-ssl-example
 
-//   context_.set_password_callback(
-//       [](std::size_t max_length, asio::ssl::context::password_purpose
-//       purpose) {
-//         return "password";
-//       });
-//   context_.use_certificate_chain_file("Http/ssl/server.crt");
-//   context_.use_private_key_file("Http/ssl/server.key",
-//   asio::ssl::context::pem);
-//   context_.use_tmp_dh_file("Http/ssl/dh512.pem");
-// }
+  context_.set_password_callback(
+      [](std::size_t max_length, asio::ssl::context::password_purpose
+      purpose) {
+        return "password";
+      });
+  context_.use_certificate_chain_file("Http/ssl/server.crt");
+  context_.use_private_key_file("Http/ssl/server.key",
+  asio::ssl::context::pem);
+  context_.use_tmp_dh_file("Http/ssl/dh512.pem");
+}
 }

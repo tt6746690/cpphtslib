@@ -2,13 +2,16 @@ project(Http)
 
 # cmake -H. -Bbuild -Wno-dev
 # cmake --build build -- -j3
-# ./bin/server
-
 
 # include directory and set up lib dependencies
 include_directories(include)
 include_directories(SYSTEM ${HEADER_ONLY_INCLUDE})
 
+# openssl
+find_package(OpenSSL)
+if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+endif()
 
 # server
 set(SOURCE_FILES 
@@ -32,7 +35,6 @@ set(SOURCE_FILES
     src/Uri.cpp
 )
 
-
 add_executable(server main.cpp ${SOURCE_FILES})
 add_library(Http ${SOURCE_FILES})
 
@@ -48,5 +50,5 @@ set(TEST_FILES
     test/test_Codec.cpp
 )
 
-add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
+add_executable(testt main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
 

@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#define BOOST_ASIO_ENABLE_HANDLER_TRACKING // debugging
+
 // #define NDEBUG
 
 #include "Constants.h"

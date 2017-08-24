@@ -106,10 +106,12 @@ int main() {
           case 'B': {
             command = "samtools view -bh " + config.BAM_FILE_DIRECTORY +
                       ctx.param_["id"] + ".bam " + region;
+            break;
           }
           case 'V': {
             command = "tabix " + config.VCF_FILE_DIRECTORY + ctx.param_["id"] +
                       ".vcf.gz " + region;
+            break;
           }
           }
 
