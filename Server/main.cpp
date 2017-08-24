@@ -12,6 +12,8 @@
 
 // Http::
 #include "Codec.h"
+#include "Constants.h"
+#include "Cors.h"
 #include "Response.h"
 #include "Server.h"
 #include "Uri.h"
@@ -28,6 +30,13 @@ using namespace Http;
 using namespace HtsgetServer;
 using nlohmann::json;
 
+void log(Context &ctx) {
+  json_type urlparse = {
+      {"query", ctx.query_}, {"param", ctx.param_},
+  };
+  std::cout << std::setw(4) << urlparse << std::endl;
+}
+
 int main() {
 
   try {
@@ -36,15 +45,10 @@ int main() {
         std::make_pair("127.0.0.1", 8888);
     auto app = std::make_unique<GenericServer>(server_address);
 
-    /* url query middleware */
-    app->router_.get("/", Handler([](Context &ctx) {
-                       ctx.req_.query_ = Uri::make_query(ctx.req_.uri_.query_);
-
-                       json_type urlparse = {
-                           {"query", ctx.query_}, {"param", ctx.param_},
-                       };
-                       std::cout << std::setw(4) << urlparse << std::endl;
-                     }));
+    /* Cors middleware */
+    // app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); //
+    // deploy
+    app->router_.get("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); // dev
 
     /*
         curl --http1.1 -v -X GET
@@ -56,6 +60,8 @@ int main() {
     app->router_.get("/reads/");
     app->router_.get(
         "/reads/<id>", Handler([&](Context &ctx) {
+
+          log(ctx);
 
           auto format = ctx.query_["format"];
           if (!format.empty() && format != "BAM" && format != "CRAM" &&

@@ -10,11 +10,11 @@
 // #define NDEBUG
 
 #include "Constants.h"
+#include "Cors.h"
 #include "Response.h"
 #include "Server.h"
 #include "Uri.h"
 #include "Utilities.h"
-#include "Cors.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -35,9 +35,11 @@ int main() {
 
     curl --http1.1 -v -X GET -H "Origin: localhost" '127.0.0.1:8888/r'
 
-    curl --http1.1 -v -X OPTIONS -H " Access-Control-Request-Method: GET" '127.0.0.1:8888/r'
+    curl --http1.1 -v -X OPTIONS -H " Access-Control-Request-Method: GET"
+    '127.0.0.1:8888/r'
 
-    curl --http1.1 -v -X OPTIONS -H "Origin: localhost" -H "Access-Control-Request-Method: GET" '127.0.0.1:8888/'
+    curl --http1.1 -v -X OPTIONS -H "Origin: localhost" -H
+    "Access-Control-Request-Method: GET" '127.0.0.1:8888/'
     */
     app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000));
 

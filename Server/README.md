@@ -26,8 +26,8 @@
     - [ ] in case of transient server error (503, other 5xx) client should implement retry logic 
     - [x] In case of error specific to `htsget` protocol, response body is a JSON of form `{error: errorType, message: msg}`
 + _CORS_
-    - [ ] API resources should support [CORS](https://www.w3.org/TR/cors/) for browser support
-    - [ ] A request with `Origin` header will be propagated to `Access-Control-Allow-Origin` header of response
+    - [x] API resources should support [CORS](https://www.w3.org/TR/cors/) for browser support
+    - [x] A request with `Origin` header will be propagated to `Access-Control-Allow-Origin` header of response
 + _Methods_
     - [x] `GET /reads/<id>`, 
         - [x] response with json containing a `ticket` allowing caller to obtain data in specified format
