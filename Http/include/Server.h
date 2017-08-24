@@ -10,14 +10,18 @@
 #include "asio.hpp"
 #include "asio/impl/src.hpp"
 #include "asio/ssl/impl/src.hpp"
-
-
 #include "asio/ssl.hpp"
 
 #include "Connection.h"
 #include "Router.h"
 
+
 #include <iostream>
+#include <memory>  
+#include <utility> 
+#include <chrono>
+
+
 
 namespace Http {
 
@@ -135,7 +139,22 @@ public:
     return std::move(socket_);
   }
 private:
-  void configure_ssl_context();
+  void inline configure_ssl_context(){
+    context_.set_options(asio::ssl::context::default_workarounds |
+                          asio::ssl::context::no_sslv2 |
+                          asio::ssl::context::single_dh_use);
+
+    // https://stackoverflow.com/questions/6452756/exception-running-boost-asio-ssl-example
+
+    context_.set_password_callback(
+        [](std::size_t max_length, asio::ssl::context::password_purpose
+        purpose) {
+          return "password";
+        });
+    context_.use_private_key_file("Http/ssl/server.key", asio::ssl::context::pem);
+    context_.use_certificate_chain_file("Http/ssl/server.crt");
+    context_.use_tmp_dh_file("Http/ssl/dh512.pem");
+  };
 
 public:
   asio::ssl::context context_;    

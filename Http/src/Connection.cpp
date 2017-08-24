@@ -15,7 +15,7 @@ namespace Http {
 
 
 template<typename SocketType>
-void Connection<SocketType>::start(){}
+void Connection<SocketType>::start() {}
 
 
 template<>

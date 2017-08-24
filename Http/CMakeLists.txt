@@ -27,7 +27,6 @@ set(SOURCE_FILES
     include/Router.h
     include/Trie.h
     include/Codec.h
-    src/Server.cpp 
     src/Connection.cpp
     src/Message.cpp
     src/RequestParser.cpp
