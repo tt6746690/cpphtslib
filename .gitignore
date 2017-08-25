@@ -1,6 +1,7 @@
 .vscode/
 log
 
+Http/ssl/passphrase
 build/
 bin/
 lib/

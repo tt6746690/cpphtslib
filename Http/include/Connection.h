@@ -5,6 +5,8 @@
 #include "asio/ssl.hpp"
 
 #include <type_traits>
+#include <utility>
+#include <iostream>
 
 #include "Request.h"
 #include "RequestParser.h"
@@ -20,13 +22,17 @@ using SslSocket = asio::ssl::stream<asio::ip::tcp::socket>;
 template <typename SocketType>
 class Connection : public std::enable_shared_from_this<Connection<SocketType>> {
 public:
-  explicit Connection(
-    SocketType&& socket, Router<Handler> &router)
-      : socket_(std::move(socket)), 
+  explicit Connection(asio::io_service& io_service, Router<Handler> &router)
+      : socket_(io_service),
         router_(router){};
 
-public:
+  explicit Connection(
+    asio::io_service& io_service, asio::ssl::context& context, Router<Handler> &router)
+      : socket_(io_service, context),
+        router_(router){};
 
+
+public:
   /**
    * @brief   Starts reading asynchronously
    *          For TLS, do handshake first
@@ -34,7 +40,7 @@ public:
   void start();
 
   /**
-   * @brief   Shutdown socket 
+   * @brief   Shuts down socket 
    */
   void terminate();
 
@@ -50,8 +56,9 @@ public:
    */
   void write_payload();
 
-private:
+public:
   SocketType socket_;
+private:
   std::array<char, 4096> buffer_;
 
   Request request_;

@@ -19,6 +19,11 @@ namespace Http {
  *          Disregard credential
  * 
  *          Options may expand to node's cors https://www.npmjs.com/package/cors
+ * 
+ * 
+ *          curl --http1.1 -v -X GET -H "Origin: localhost" '127.0.0.1:8888/r'
+ *          curl --http1.1 -v -X OPTIONS -H " Access-Control-Request-Method: GET" '127.0.0.1:8888/r'
+ *          curl --http1.1 -v -X OPTIONS -H "Origin: localhost" -H "Access-Control-Request-Method: GET" '127.0.0.1:8888/'
  */
 class Cors : public Handler {
 

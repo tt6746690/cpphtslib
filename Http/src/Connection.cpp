@@ -15,23 +15,6 @@ namespace Http {
 
 
 template<typename SocketType>
-void Connection<SocketType>::start() {}
-
-
-template<>
-void Connection<TcpSocket>::start() { read_payload(); }
-
-template<>
-void Connection<SslSocket>::start(){
-   socket_.async_handshake(asio::ssl::stream_base::server,
-        [this, self=this->shared_from_this()]
-          (std::error_code ec){
-            read_payload();
-          });
-}
-
-
-template<typename SocketType>
 void Connection<SocketType>::terminate() {};
 
 template<>
@@ -42,7 +25,28 @@ void Connection<TcpSocket>::terminate(){
 
 template<>
 void Connection<SslSocket>::terminate(){
-  socket_.shutdown();
+  socket_.async_shutdown(
+    [this, self=this->shared_from_this()](std::error_code ec) { 
+    socket_.lowest_layer().close(); 
+  });
+}
+
+template<typename SocketType>
+void Connection<SocketType>::start() {}
+
+
+template<>
+void Connection<TcpSocket>::start() { read_payload(); }
+
+template<>
+void Connection<SslSocket>::start(){
+
+  socket_.async_handshake(asio::ssl::stream_base::server,
+    [this, self=this->shared_from_this()]
+      (std::error_code ec){
+        if(!ec)
+          read_payload();
+      });
 }
 
 
@@ -103,18 +107,20 @@ void Connection<SocketType>::read_payload() {
         default:
           break;
         }
-      }
+      } 
     });
 }
 
 template<typename SocketType>
 void Connection<SocketType>::write_payload() {
+
   asio::async_write(
     socket_, 
     asio::buffer(response_.to_payload()),
     asio::transfer_all(),
     [ this, self = this->shared_from_this() ](
         std::error_code ec, std::size_t bytes_written) {
+
       if (!ec) {
         terminate();
       }

@@ -17,9 +17,11 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <memory>  
 #include <utility> 
 #include <chrono>
+#include <string>
 
 
 
@@ -59,26 +61,8 @@ public:
     acceptor_.bind(endpoint);
     acceptor_.listen();
     /* accpeting connection on an event loop */
-    accept_connection();
-
+    static_cast<Derived*>(this)->accept_connection();
     io_service_.run();
-  }
-
-  /**
-   * @brief   Accept connection and creates new sessino 
-   */
-  void accept_connection(){
-    acceptor_.async_accept(static_cast<Derived*>(this)->socket(), 
-    [=](std::error_code ec) {
-      if (!ec) {
-        auto new_connection =
-            std::make_shared<
-              Connection<decltype(static_cast<Derived*>(this)->socket_)>>
-              (std::move(static_cast<Derived*>(this)->socket_move()), router_);
-        new_connection->start();
-      }
-      accept_connection();
-    });
   }
 
   /**
@@ -105,18 +89,26 @@ public:
 class HttpServer: public GenericServer<HttpServer>{
 public:
   explicit HttpServer(const ServerAddr server_addr)
-    : GenericServer(server_addr),
-      socket_(io_service_) {};
-
-  auto inline socket() -> TcpSocket& {
-    return socket_;
-  }
-  auto inline socket_move() -> TcpSocket&& {
-    return std::move(socket_);
-  }
+    : GenericServer(server_addr){};
 
 public:
-  TcpSocket socket_;
+  /**
+   * @brief   Accept connection and creates new session
+   */
+  void accept_connection(){
+
+    auto new_conn = 
+      std::make_shared<Connection<TcpSocket>>(io_service_, router_);
+
+    acceptor_.async_accept(new_conn->socket_, 
+    [this, new_conn](std::error_code ec) {
+
+      if (!ec) {
+        new_conn->start();
+      }
+      accept_connection();
+    });
+  }
 };
 
 /**
@@ -126,39 +118,55 @@ class HttpsServer: public GenericServer<HttpsServer>{
 public:
   explicit HttpsServer(const ServerAddr server_addr)
     : GenericServer(server_addr),
-      context_(asio::ssl::context::sslv23),
-      socket_(io_service_, context_)
+      context_(asio::ssl::context::sslv23)
       { 
         configure_ssl_context(); 
       };
     
-  auto inline socket() -> SslSocket::lowest_layer_type&{
-    return socket_.lowest_layer();
+public:
+  /**
+   * @brief   Accept connection and creates new session
+   */
+  void accept_connection(){
+
+    auto new_conn = 
+      std::make_shared<Connection<SslSocket>>(io_service_, context_, router_);
+
+    acceptor_.async_accept(new_conn->socket_.lowest_layer(), 
+    [this, new_conn](std::error_code ec) {
+      if (!ec) {
+        new_conn->start();
+      }
+      accept_connection();
+    });
   }
-  auto inline socket_move() -> SslSocket&& {
-    return std::move(socket_);
-  }
+
 private:
+  /**
+   * @brief   Sets options, key, cert for Openssl 
+   */
   void inline configure_ssl_context(){
     context_.set_options(asio::ssl::context::default_workarounds |
                           asio::ssl::context::no_sslv2 |
                           asio::ssl::context::single_dh_use);
 
-    // https://stackoverflow.com/questions/6452756/exception-running-boost-asio-ssl-example
-
     context_.set_password_callback(
         [](std::size_t max_length, asio::ssl::context::password_purpose
         purpose) {
-          return "password";
+          std::string passphrase;
+          std::fstream passinf ("Http/ssl/passphrase", std::ios::in);
+          if(passinf){
+            std::getline(passinf, passphrase);
+          }
+          return passphrase;
         });
-    context_.use_private_key_file("Http/ssl/server.key", asio::ssl::context::pem);
-    context_.use_certificate_chain_file("Http/ssl/server.crt");
+    context_.use_private_key_file("Http/ssl/key.pem", asio::ssl::context::pem);
+    context_.use_certificate_chain_file("Http/ssl/cert.pem");
     context_.use_tmp_dh_file("Http/ssl/dh512.pem");
   };
 
-public:
-  asio::ssl::context context_;    
-  SslSocket socket_;
+private:
+  asio::ssl::context context_;
 };
 }
 

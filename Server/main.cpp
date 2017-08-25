@@ -43,16 +43,15 @@ int main() {
     auto config = ServerConfig();
     ServerAddr server_address =
         std::make_pair("127.0.0.1", 8888);
-    auto app = std::make_unique<HttpServer>(server_address);
+    auto app = std::make_unique<HttpsServer>(server_address);
+
 
     /* Cors middleware */
     // app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); //
     // deploy
-    app->router_.get("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); // dev
 
     /*
-        curl --http1.1 -v -X GET
-       '127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150'
+        curl --http1.1 -v -X GET '127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150'
 
        curl --http1.1 -v -X GET
        '127.0.0.1:8888/reads/vcftest?format=VCF&referenceName=Y&start=2690000&end=2800000'
@@ -209,6 +208,9 @@ int main() {
           delete[] buffer;
         }));
 
+
+    std::cout << "app starts running on " << 
+      app->host() << std::to_string(app->port()) << std::endl;
     std::cout << app->router_ << std::endl;
     app->run();
   } catch (std::exception e) {
