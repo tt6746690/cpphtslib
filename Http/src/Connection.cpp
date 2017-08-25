@@ -13,30 +13,44 @@ using namespace std;
 
 namespace Http {
 
+template<typename SocketType> 
+void Connection<SocketType>::stop(){
+  read_deadline_.cancel();
+}
 
 template<typename SocketType>
 void Connection<SocketType>::terminate() {};
 
 template<>
 void Connection<TcpSocket>::terminate(){
+  stop();
   socket_.shutdown(asio::ip::tcp::socket::shutdown_both);
   socket_.close();
 }
 
 template<>
 void Connection<SslSocket>::terminate(){
+  stop();
   socket_.async_shutdown(
     [this, self=this->shared_from_this()](std::error_code ec) { 
     socket_.lowest_layer().close(); 
   });
 }
 
+
 template<typename SocketType>
 void Connection<SocketType>::start() {}
 
-
 template<>
-void Connection<TcpSocket>::start() { read_payload(); }
+void Connection<TcpSocket>::start() { 
+  read(); 
+
+  read_deadline_.async_wait(
+    [this, self=this->shared_from_this()]
+      (std::error_code ec){
+      check_read_deadline();
+  });
+}
 
 template<>
 void Connection<SslSocket>::start(){
@@ -44,14 +58,41 @@ void Connection<SslSocket>::start(){
   socket_.async_handshake(asio::ssl::stream_base::server,
     [this, self=this->shared_from_this()]
       (std::error_code ec){
-        if(!ec)
-          read_payload();
+        if(!ec){
+          read();
+          read_deadline_.async_wait(
+            [this, self=this->shared_from_this()]
+              (std::error_code ec){
+              check_read_deadline();
+          });
+        }
       });
+}
+
+template<typename SocketType>
+void Connection<SocketType>::send_read_timeout(){
+  response_.status_code(StatusCode::Request_Timeout);
+  write();
+}
+
+template<typename SocketType>
+void Connection<SocketType>::check_read_deadline(){
+  if(read_deadline_.expires_at() <= ClockType::now()){
+    send_read_timeout();
+  } else {
+    read_deadline_.async_wait(
+      [this, self=this->shared_from_this()]
+        (std::error_code ec){
+        check_read_deadline();
+    });
+  }
 }
 
 
 template<typename SocketType>
-void Connection<SocketType>::read_payload() {
+void Connection<SocketType>::read() {
+
+  read_deadline_.expires_from_now(read_timeout);
 
   asio::async_read(
     socket_, 
@@ -61,7 +102,6 @@ void Connection<SocketType>::read_payload() {
       (std::error_code ec, std::size_t bytes_read) {
 
       assert(this == self.get());
-
       if (!ec) {
         decltype(buffer_.begin()) begin;
         ParseStatus parse_status;
@@ -81,7 +121,7 @@ void Connection<SocketType>::read_payload() {
         */
         switch (parse_status) {
         case ParseStatus::in_progress: {
-          read_payload();
+          read();
           break;
         }
         case ParseStatus::accept: {
@@ -95,13 +135,13 @@ void Connection<SocketType>::read_payload() {
             handler(context_);
           }
 
-          write_payload();
+          write();
           break;
         }
 
         case ParseStatus::reject: {
           response_.status_code(StatusCode::Bad_Request);
-          write_payload();
+          write();
           break;
         }
         default:
@@ -112,7 +152,8 @@ void Connection<SocketType>::read_payload() {
 }
 
 template<typename SocketType>
-void Connection<SocketType>::write_payload() {
+void Connection<SocketType>::write() {
+
 
   asio::async_write(
     socket_, 

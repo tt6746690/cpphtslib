@@ -41,7 +41,6 @@ A server implementation of htsget [protocol](http://samtools.github.io/hts-specs
     ```
     + `/reads/<id>`
         + handles incoming request, dispatch tickets in json 
-            + i.e. `/reads/<id>?format=BAM&referenceName=1&start=10145&end=10150`
     + `/data/<filename>`
         + handles data transfer, according to byte range
 + _Test with samtools_

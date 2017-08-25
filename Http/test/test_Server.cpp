@@ -1,4 +1,5 @@
 #include "catch.hpp"
+#include "asio.hpp"
 #include <utility>
 #include <stdexcept>
 

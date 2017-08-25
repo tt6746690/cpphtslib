@@ -42,15 +42,15 @@ int main() {
   try {
     auto config = ServerConfig();
     ServerAddr server_address = std::make_pair("127.0.0.1", 8888);
-    auto app = std::make_unique<HttpServer>(server_address);
+    auto app = std::make_unique<HttpsServer>(server_address);
 
     /* Cors middleware */
     // app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); //
     // deploy
 
     /*
-       curl --http1.1 -v -X GET
-       '127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150'
+       curl -v -X GET
+       'https://127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150'
 
        curl --http1.1 -v -X GET
        '127.0.0.1:8888/reads/vcftest?format=VCF&referenceName=Y&start=2690000&end=2800000'
@@ -107,7 +107,7 @@ int main() {
 
           switch (format.front()) {
           case 'B': {
-            command = "samtools view -bh " + config.BAM_FILE_DIRECTORY +
+            command = "samtools view -b -h " + config.BAM_FILE_DIRECTORY +
                       ctx.param_["id"] + ".bam " + "chr" + region;
             break;
           }
@@ -135,7 +135,7 @@ int main() {
               SHA256Codec().digest(ctx.param_["id"] + format);
 
           std::string f_relpath = config.TEMP_FILE_DIRECTORY + tempfilename;
-          std::string url_abspath = "http://127.0.0.1:8888/" + f_relpath;
+          std::string url_abspath = app->base_url() + "/" + f_relpath;
 
           std::string buf;
           std::fstream queryout(f_relpath, std::ios::out);
@@ -217,8 +217,7 @@ int main() {
           delete[] buffer;
         }));
 
-    std::cout << "app starts running on " << app->host()
-              << std::to_string(app->port()) << std::endl;
+    std::cout << "app starts running on " << app->base_url() << std::endl;
     std::cout << app->router_ << std::endl;
     app->run();
   } catch (std::exception e) {
