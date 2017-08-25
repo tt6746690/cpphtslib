@@ -41,17 +41,16 @@ int main() {
 
   try {
     auto config = ServerConfig();
-    ServerAddr server_address =
-        std::make_pair("127.0.0.1", 8888);
-    auto app = std::make_unique<HttpsServer>(server_address);
-
+    ServerAddr server_address = std::make_pair("127.0.0.1", 8888);
+    auto app = std::make_unique<HttpServer>(server_address);
 
     /* Cors middleware */
     // app->router_.use("/", Cors({"*"}, {RequestMethod::GET}, 51840000)); //
     // deploy
 
     /*
-        curl --http1.1 -v -X GET '127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150'
+       curl --http1.1 -v -X GET
+       '127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150'
 
        curl --http1.1 -v -X GET
        '127.0.0.1:8888/reads/vcftest?format=VCF&referenceName=Y&start=2690000&end=2800000'
@@ -98,13 +97,23 @@ int main() {
                                 "Request parameter: start is greater than end");
           }
 
-          std::string region = referenceName + ":" + start + "-" + end;
+          std::string region;
+          if (start.empty() && end.empty())
+            region = referenceName;
+          else
+            region = referenceName + ":" + start + "-" + end;
+
           std::string command;
 
           switch (format.front()) {
           case 'B': {
             command = "samtools view -bh " + config.BAM_FILE_DIRECTORY +
-                      ctx.param_["id"] + ".bam " + region;
+                      ctx.param_["id"] + ".bam " + "chr" + region;
+            break;
+          }
+          case 'C': {
+            command = "samtools view -C -h " + config.CRAM_FILE_DIRECTORY +
+                      ctx.param_["id"] + ".cram " + "chr" + region;
             break;
           }
           case 'V': {
@@ -208,9 +217,8 @@ int main() {
           delete[] buffer;
         }));
 
-
-    std::cout << "app starts running on " << 
-      app->host() << std::to_string(app->port()) << std::endl;
+    std::cout << "app starts running on " << app->host()
+              << std::to_string(app->port()) << std::endl;
     std::cout << app->router_ << std::endl;
     app->run();
   } catch (std::exception e) {

@@ -1,6 +1,28 @@
 
 
-### a simple `Http` library
+
+### FAQ 
+
++ __Dependencies__
+    + [Asio](http://think-async.com/Asio)
+    + [Catch](https://github.com/philsquared/Catch)
+    + [nlohmann/json](https://github.com/nlohmann/json)
+    + [OpenSSL](https://github.com/openssl/openssl)
+    + [CMake](https://github.com/Kitware/CMake)
++ __C++17__
+    + flags `-std=c++1z -stdlib=libc++`
+    + compiled with `clang-802.0.42` on `macOS`
++ __Build__
+    ```sh
+    cmake -H. -Bbuild -Wno-error=dev 
+    cmake --build build -- -j5
+    ```
++ __Run__
+    ```sh 
+    ./bin/server
+    ```
+
+### A simple `Http` library
 
 + Partial implementation (as much as needed) of HTTP/1.1
     + Request parsing and response writing
@@ -8,16 +30,16 @@
 + Compact-trie based router to handle 
     + request-response cycle 
     + middleware stuff
-+ HTTPS with OpenSSL
++ HTTPS with Asio's wrapper around OpenSSL 
++ Middlewares
+    + CORS
 
 ### Todos
 
 - [ ] chunked transfer encoding
 - [ ] Multithreaded support 
 - [ ] async file serving 
-- [ ] some useful middlewares
-    - [ ] body parser
-    - [x] CORS
+- [ ] body parser
 
 
 
@@ -31,7 +53,6 @@
 + [go.http](https://golang.org/pkg/net/http/)
 + [mozilla doc on HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/)
 + [sprint.io on CORS](https://spring.io/understanding/CORS)
-
 
 
 ### QA

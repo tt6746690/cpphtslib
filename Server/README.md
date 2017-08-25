@@ -58,10 +58,10 @@
     - [ ] HTTPS data block urls 
         - [x] percent-encoded path and query, url format [specification](http://www.ietf.org/rfc/rfc2396.txt)
         - [x] accepts `GET` request 
-        - [ ] provide CORS
+        - [x] provide CORS
         - [ ] provide multiple request retries, within reason 
-        - [ ] use HTTPS 
-        - [ ] Server supply response with `Content-Length` header, chunked transfer encoding, or both. Client should detect response truncation 
+        - [x] use HTTPS 
+        - [x] Server supply response with `Content-Length` header, chunked transfer encoding, or both. Client should detect response truncation 
         - [ ] client and url endpoint should negotiate HTTP/2 upgrade 
         - [ ] client follow 3xx redirects from URL, 
     - [x] Inline data block uris

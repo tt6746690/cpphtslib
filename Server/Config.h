@@ -9,8 +9,9 @@ class ServerConfig {
 
 public:
   std::string BAM_FILE_DIRECTORY = "data/";
-  std::string TEMP_FILE_DIRECTORY = "data/";
+  std::string CRAM_FILE_DIRECTORY = "data/";
   std::string VCF_FILE_DIRECTORY = "data/";
+  std::string TEMP_FILE_DIRECTORY = "data/";
   static constexpr int MAX_BYTE_RANGE = 1024;
 };
 }
