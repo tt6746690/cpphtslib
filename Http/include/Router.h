@@ -53,7 +53,7 @@ public:
 
   explicit Handler_() : handler_(nullptr), handler_id_(0){};
   explicit Handler_(HandlerFunc handler,
-                    Counter count_up = global_handler_counter)
+                    Counter& count_up = global_handler_counter)
       : handler_(handler), handler_id_(count_up()){};
 
   operator bool() const { return handler_ != nullptr; }
@@ -63,7 +63,7 @@ public:
   }
   bool operator!=(const Handler_<> &rhs) { return !(operator==(rhs)); }
 
-  void handle(HandlerFunc handle, Counter count_up = global_handler_counter) {
+  void handle(HandlerFunc handle, Counter& count_up = global_handler_counter) {
     handler_ = handle;
     if (!handler_id_)
       handler_id_ = count_up();

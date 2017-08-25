@@ -40,8 +40,8 @@ TEST_CASE("handle, resolves", "[Router]")
         SECTION("Simple handle")
         {
             REQUIRE(r.routes_[0].size() == 3);
-            REQUIRE(home_foo_handle.handler_id_ == 1);
-            REQUIRE(home_bar_handle.handler_id_ == 2);
+            REQUIRE(home_foo_handle.handler_id_ == 2);
+            REQUIRE(home_bar_handle.handler_id_ == 3);
         }
 
         SECTION("handles multiple methods")

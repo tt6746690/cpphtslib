@@ -17,7 +17,7 @@ A server implementation of htsget [protocol](http://samtools.github.io/hts-specs
     + compiled with `clang-802.0.42` on `macOS`
 + __Build__
     ```sh
-    cmake -H. -Bbuild -Wno-error=dev 
+    cmake -H. -Bbuild -Wno-dev
     cmake --build build -- -j5
     ```
 + __Run__
@@ -44,7 +44,9 @@ A server implementation of htsget [protocol](http://samtools.github.io/hts-specs
     + `/data/<filename>`
         + handles data transfer, according to byte range
 + _Test with samtools_
-    + `samtools view "http://127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150"`
+    ```sh
+    samtools view "http://127.0.0.1:8888/reads/bamtest?format=BAM&referenceName=1&start=10145&end=10150"
+    ```
     ```sh 
     SOLEXA-1GA-2_2_FC20EMB:5:251:979:328    0       chr1    10145   25      36M     *       0       0       AACCCCTAACCCTAACCCTAACCCTAACCCTAAACT    hhhhHcWhhHTghcKA_ONhAAEEBZE?H?CBC?DA       NM:i:1  X1:i:1  MD:Z:33A2
     SOLEXA-1GA-2_2_FC20EMB:5:102:214:278    0       chr1    10148   25      36M     *       0       0       CCCTAACCCTAACCCTAACCCTAACCCTAACCTAAC    hbfhhhXUYhT_ULZdLRTKNIMIKGLJCHFFJQJN       NM:i:0  X0:i:1  MD:Z:36

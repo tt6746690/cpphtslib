@@ -49,5 +49,5 @@ set(TEST_FILES
     test/test_Codec.cpp
 )
 
-add_executable(testt main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
+add_executable(test main-test.cpp  ${TEST_FILES} ${SOURCE_FILES})
 

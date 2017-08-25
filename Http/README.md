@@ -14,7 +14,7 @@
     + compiled with `clang-802.0.42` on `macOS`
 + __Build__
     ```sh
-    cmake -H. -Bbuild -Wno-error=dev 
+    cmake -H. -Bbuild -Wno-dev 
     cmake --build build -- -j5
     ```
 + __Run__
